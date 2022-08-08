@@ -1,8 +1,8 @@
 package services
 import domain.User
 import domain.dto.AuthenticateDTO
-import services.repos.UserRepo
 import domain.errors.CustomError.*
+import services.repos.user.UserRepo
 import zio.*
 
 trait Authentication {

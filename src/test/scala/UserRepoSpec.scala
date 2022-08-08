@@ -1,9 +1,9 @@
 import domain.User
 import domain.dto.UserRegistrationDTO
-import services.repos.UserRepoLive
-import zio.{Ref, ZIO}
+import services.repos.user.UserRepoLive
 import zio.test.*
 import zio.test.Assertion.*
+import zio.{Ref, ZIO}
 
 import java.util.UUID
 

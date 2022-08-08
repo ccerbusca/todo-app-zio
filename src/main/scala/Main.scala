@@ -1,7 +1,9 @@
-import domain.User
+import domain.{Todo, User}
 import domain.dto.AuthenticateDTO
 import services.Authentication
-import services.repos.{InMemoryRepo, UserRepo}
+import services.repos.InMemoryRepo
+import services.repos.todo.TodoRepo
+import services.repos.user.UserRepo
 import zhttp.http.*
 import zhttp.http.middleware.HttpMiddleware
 import zhttp.service.*
@@ -17,21 +19,24 @@ object Main extends ZIOAppDefault {
       credentials => Authentication.authenticate(AuthenticateDTO.fromCredentials(credentials)).isSuccess
     }
 
-  val endpointsToSecure: HttpApp[UserRepo, Throwable] = UserRepo.endpoints
+  val endpointsToSecure: HttpApp[TodoRepo, Throwable] = TodoRepo.endpoints
 
-  val unsecureEndpoints = Http.collect[Request] {
+  val unsecureEndpoints: HttpApp[UserRepo, Throwable] = Http.collect[Request] {
     case Method.GET -> !! / "test" => Response.text("123")
-  }
+  } ++ UserRepo.endpoints
 
-  val secured = endpointsToSecure @@ authMiddleware
+  val secured: HttpApp[Authentication & UserRepo & TodoRepo, Throwable] = endpointsToSecure @@ authMiddleware
 
-  override def run =
+  override def run: Task[Nothing] =
     Server
-      .start(port = 8080, http = secured ++ unsecureEndpoints @@ Middleware.debug)
+      .start(port = 8080, http = (unsecureEndpoints ++ secured) @@ Middleware.debug)
       .provide(
         UserRepo.inMemory,
+        TodoRepo.inMemory,
         Authentication.live,
         InMemoryRepo.live[User, UUID],
-        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User])
+        InMemoryRepo.live[Todo, UUID],
+        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User]),
+        ZLayer.fromZIO(ConcurrentMap.empty[UUID, Todo])
       )
 }

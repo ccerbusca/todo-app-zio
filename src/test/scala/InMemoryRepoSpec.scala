@@ -1,10 +1,10 @@
+import domain.errors.CustomError.NotFound
 import domain.{User, WithId}
 import services.repos.{InMemoryRepo, InMemoryRepoLive}
+import zio.*
+import zio.concurrent.ConcurrentMap
 import zio.test.*
 import zio.test.Assertion.*
-import zio.*
-import domain.errors.CustomError.NotFound
-import zio.concurrent.ConcurrentMap
 
 import java.util.UUID
 
@@ -35,7 +35,7 @@ object InMemoryRepoSpec extends ZIOSpecDefault {
         assertZIO(
           InMemoryRepo.find[TestObject, Int](_.content == "wrong").exit
         )(
-          fails(equalTo(NotFound()))
+          fails(equalTo(NotFound))
         ).provideLayer(ZLayer.fromZIO(ConcurrentMap.empty[Int, TestObject].map(InMemoryRepoLive.apply)))
       }
     )

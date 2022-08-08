@@ -9,7 +9,6 @@ import java.util.UUID
 
 trait InMemoryRepo[T <: WithId[ID], ID] extends Repo[T, ID] {
   def add(entity: T): ZIO[Any, Throwable, T]
-  def find(pred: T => Boolean): ZIO[Any, Throwable, T]
 }
 
 case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID, T]) extends InMemoryRepo[T, ID] {
@@ -18,15 +17,15 @@ case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID
       .put(entity.id, entity)
       .as(entity)
 
-  override def get(uuid: ID): ZIO[Any, Throwable, T] =
+  override def get(id: ID): ZIO[Any, Throwable, T] =
     concurrentMap
-      .get(uuid)
-      .someOrFail(NotFound())
+      .get(id)
+      .someOrFail(NotFound)
 
   override def find(pred: T => Boolean): ZIO[Any, Throwable, T] =
     concurrentMap
       .collectFirst { case (_, v) if pred(v) => v }
-      .someOrFail(NotFound())
+      .someOrFail(NotFound)
 }
 
 object InMemoryRepo {
