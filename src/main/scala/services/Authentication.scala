@@ -11,7 +11,9 @@ trait Authentication {
 
 case class AuthenticationLive(userRepo: UserRepo) extends Authentication {
   override def authenticate(authDTO: AuthenticateDTO): ZIO[Any, Throwable, User] =
-    userRepo.get(authDTO.username).filterOrFail(_.password == authDTO.password)(WrongCredentials)
+    userRepo
+      .get(authDTO.username)
+      .filterOrFail(_.password == authDTO.password)(WrongCredentials)
 }
 
 object Authentication {

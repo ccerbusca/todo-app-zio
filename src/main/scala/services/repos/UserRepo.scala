@@ -11,14 +11,14 @@ import java.util.UUID
 
 trait UserRepo extends Repo[User, UUID] {
   def get(username: String): ZIO[Any, Throwable, User]
-  def add(user: UserRegistrationDTO): ZIO[Any, Nothing, User]
+  def add(registerDTO: UserRegistrationDTO): ZIO[Any, Throwable, User]
 }
 
 case class UserRepoLive(dbRef: Ref[Map[UUID, User]]) extends UserRepo {
   override def get(uuid: UUID): ZIO[Any, Throwable, User] =
     for {
       innerDB <- dbRef.get
-      user <- ZIO.fromOption(innerDB.get(uuid)).orElseFail(UserNotFound)
+      user <- ZIO.fromOption(innerDB.get(uuid)).orElseFail(NotFound())
     } yield user
 
   override def add(registerDTO: UserRegistrationDTO): ZIO[Any, Nothing, User] =
@@ -31,8 +31,22 @@ case class UserRepoLive(dbRef: Ref[Map[UUID, User]]) extends UserRepo {
   override def get(username: String): ZIO[Any, Throwable, User] =
     for {
       db <- dbRef.get
-      userResult <- ZIO.fromOption(db.values.find(_.username == username)).orElseFail(UserNotFound)
+      userResult <- ZIO.fromOption(db.values.find(_.username == username)).orElseFail(NotFound())
     } yield userResult
+}
+
+case class UserRepoInMemory(inMemoryRepo: InMemoryRepo[User, UUID]) extends UserRepo {
+  override def get(username: String): ZIO[Any, Throwable, User] =
+    inMemoryRepo.find(_.username == username)
+
+  override def add(registerDTO: UserRegistrationDTO): ZIO[Any, Throwable, User] =
+    for {
+      uuid <- Random.nextUUID
+      newUser = User(registerDTO.username, registerDTO.password, uuid)
+      user <- inMemoryRepo.add(newUser)
+    } yield user
+
+  override def get(uuid: UUID): ZIO[Any, Throwable, User] = inMemoryRepo.get(uuid)
 }
 
 object UserRepo {
@@ -40,11 +54,16 @@ object UserRepo {
     ZLayer {
       ZIO.service[Ref[Map[UUID, User]]].map(UserRepoLive.apply)
     }
+    
+  val inMemory: ZLayer[InMemoryRepo[User, UUID], Nothing, UserRepoInMemory] =
+    ZLayer {
+      ZIO.service[InMemoryRepo[User, UUID]].map(UserRepoInMemory.apply)
+    }
 
   def get(uuid: UUID): ZIO[UserRepo, Throwable, User] =
     ZIO.serviceWithZIO(_.get(uuid))
 
-  def add(entity: UserRegistrationDTO): ZIO[UserRepo, Nothing, User] =
+  def add(entity: UserRegistrationDTO): ZIO[UserRepo, Throwable, User] =
     ZIO.serviceWithZIO(_.add(entity))
 
   val endpoints = Http.collectZIO[Request] {

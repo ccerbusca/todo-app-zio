@@ -1,4 +1,5 @@
 import domain.User
+import domain.dto.UserRegistrationDTO
 import services.repos.UserRepoLive
 import zio.{Ref, ZIO}
 import zio.test.*
@@ -15,11 +16,11 @@ object UserRepoSpec extends ZIOSpecDefault {
           repo = UserRepoLive(db)
           uuid <- zio.Random.nextUUID
           _ <- TestRandom.feedUUIDs(uuid)
-          newUser = User("test", "test")
+          newUser = UserRegistrationDTO("test", "test")
           _ <- repo.add(newUser)
           map <- db.get
           user <- repo.get(uuid)
-        } yield assertTrue(newUser == user.entity && map.contains(uuid))
+        } yield assertTrue(User("test", "test", uuid) == user && map.contains(uuid))
       }
     }
 }

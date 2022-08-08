@@ -1,35 +1,37 @@
 import domain.User
 import domain.dto.AuthenticateDTO
 import services.Authentication
-import services.repos.UserRepo
-import zhttp.service.*
-import zio.*
+import services.repos.{InMemoryRepo, UserRepo}
 import zhttp.http.*
 import zhttp.http.middleware.HttpMiddleware
+import zhttp.service.*
+import zio.*
+import zio.concurrent.ConcurrentMap
 
 import java.io.IOException
 import java.util.UUID
 
 object Main extends ZIOAppDefault {
-  val endpoints: HttpApp[UserRepo, Throwable] = UserRepo.endpoints
+  val authMiddleware: HttpMiddleware[Authentication, Nothing] =
+    Middleware.basicAuthZIO {
+      credentials => Authentication.authenticate(AuthenticateDTO.fromCredentials(credentials)).isSuccess
+    }
 
-  val middleware: HttpMiddleware[UserRepo & Authentication, IOException] =
-    Middleware.basicAuthZIO(c => Authentication.authenticate(AuthenticateDTO.fromCredentials(c)).isSuccess) ++ Middleware.debug
+  val endpointsToSecure: HttpApp[UserRepo, Throwable] = UserRepo.endpoints
 
-  val httpApp: HttpApp[UserRepo & Authentication, Throwable] = endpoints
-
-  val endpoints2 = Http.collect[Request] {
+  val unsecureEndpoints = Http.collect[Request] {
     case Method.GET -> !! / "test" => Response.text("123")
   }
 
-  val secured = endpoints2 @@ middleware
+  val secured = endpointsToSecure @@ authMiddleware
 
   override def run =
     Server
-      .start(port = 8080, http = (httpApp @@ Middleware.debug) ++ secured)
+      .start(port = 8080, http = secured ++ unsecureEndpoints @@ Middleware.debug)
       .provide(
-        UserRepo.live,
+        UserRepo.inMemory,
         Authentication.live,
-        ZLayer.fromZIO(Ref.make(Map.empty[UUID, User]))
+        InMemoryRepo.live[User, UUID],
+        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User])
       )
 }
