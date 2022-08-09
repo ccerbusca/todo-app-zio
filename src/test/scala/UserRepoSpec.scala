@@ -1,6 +1,6 @@
 import domain.User
-import domain.dto.UserRegistrationDTO
-import services.repos.user.UserRepoLive
+import domain.dto.UserRegister
+import repos.user.UserRepoLive
 import zio.test.*
 import zio.test.Assertion.*
 import zio.{Ref, ZIO}
@@ -16,7 +16,7 @@ object UserRepoSpec extends ZIOSpecDefault {
           repo = UserRepoLive(db)
           uuid <- zio.Random.nextUUID
           _ <- TestRandom.feedUUIDs(uuid)
-          newUser = UserRegistrationDTO("test", "test")
+          newUser = UserRegister("test", "test")
           _ <- repo.add(newUser)
           map <- db.get
           user <- repo.get(uuid)

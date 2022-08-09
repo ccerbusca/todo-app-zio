@@ -13,5 +13,4 @@ case class User(
 
 object User {
   given encoder: JsonEncoder[User] = DeriveJsonEncoder.gen[User]
-  given decoder: JsonDecoder[User] = DeriveJsonDecoder.gen[User]
 }

@@ -1,4 +1,4 @@
-package services.repos
+package repos
 
 import domain.WithId
 import domain.errors.CustomError.*
@@ -8,7 +8,7 @@ import zio.concurrent.ConcurrentMap
 import java.util.UUID
 
 trait InMemoryRepo[T <: WithId[ID], ID] extends Repo[T, ID] {
-  def add(entity: T): ZIO[Any, Throwable, T]
+  def find(pred: T => Boolean): Task[T]
 }
 
 case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID, T]) extends InMemoryRepo[T, ID] {

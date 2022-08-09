@@ -1,6 +1,6 @@
 import domain.errors.CustomError.NotFound
 import domain.{User, WithId}
-import services.repos.{InMemoryRepo, InMemoryRepoLive}
+import repos.{InMemoryRepo, InMemoryRepoLive}
 import zio.*
 import zio.concurrent.ConcurrentMap
 import zio.test.*
