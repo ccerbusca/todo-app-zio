@@ -1,6 +1,8 @@
 import domain.User
 import domain.dto.UserRegister
-import repos.user.UserRepoLive
+import repos.{InMemoryRepo, InMemoryRepoLive}
+import repos.user.{UserRepoInMemory, UserRepoLive}
+import zio.concurrent.ConcurrentMap
 import zio.test.*
 import zio.test.Assertion.*
 import zio.{Ref, ZIO}
@@ -12,15 +14,16 @@ object UserRepoSpec extends ZIOSpecDefault {
     suite("UserRepoSpec") {
       test("Repo adds user correctly") {
         for {
-          db <- Ref.make(Map.empty[UUID, User])
-          repo = UserRepoLive(db)
+          map <- ConcurrentMap.empty[UUID, User]
+          inMemory: InMemoryRepo[User, UUID] = InMemoryRepoLive[User, UUID](map)
+          repo = UserRepoInMemory(inMemory)
           uuid <- zio.Random.nextUUID
           _ <- TestRandom.feedUUIDs(uuid)
-          newUser = UserRegister("test", "test")
+          newUser = User("test", "test", uuid)
           _ <- repo.add(newUser)
-          map <- db.get
           user <- repo.get(uuid)
-        } yield assertTrue(User("test", "test", uuid) == user && map.contains(uuid))
+          exists <- map.exists((k, _) => k == uuid)
+        } yield assertTrue(User("test", "test", uuid) == user && exists)
       }
     }
 }
