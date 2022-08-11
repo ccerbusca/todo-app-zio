@@ -13,13 +13,13 @@ case class AuthServiceLive(userRepo: UserRepo) extends AuthService {
   override def authenticate(authDTO: UserAuthenticate): ZIO[Any, Throwable, User] =
     userRepo
       .findByUsername(authDTO.username)
-      .filterOrFail(_.password == authDTO.password)(WrongCredentials)
+      .filterOrFail(_.password == authDTO.password)(WrongAuthInfo)
 }
 
 object AuthService {
   val live: ZLayer[UserRepo, Nothing, AuthServiceLive] =
     ZLayer.fromFunction(AuthServiceLive.apply)
 
-  def authenticate(authDTO: UserAuthenticate): ZIO[AuthService, Any, User] =
+  def authenticate(authDTO: UserAuthenticate): ZIO[AuthService, Throwable, User] =
     ZIO.serviceWithZIO(_.authenticate(authDTO))
 }
