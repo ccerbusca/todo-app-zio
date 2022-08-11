@@ -16,20 +16,20 @@ object AuthMiddleware {
     verify: Credentials => ZIO[R, E, A]
   ): Middleware[R, E, AuthContext[A], Response, Request, Response] =
     customAuthMiddleware(
-      _.basicAuthorizationCredentials,
-      verify,
-      Headers(HttpHeaderNames.WWW_AUTHENTICATE, BasicSchemeName),
-      error
+      extract = headers => headers.basicAuthorizationCredentials,
+      verify  = verify,
+      headers = Headers(HttpHeaderNames.WWW_AUTHENTICATE, BasicSchemeName),
+      error   = error
     )
 
   def customBearerAuth[R, E, A](error: E)(
     verify: String => ZIO[R, E, A]
   ): Middleware[R, E, AuthContext[A], Response, Request, Response] =
     customAuthMiddleware(
-      _.bearerToken,
-      verify,
-      Headers(HttpHeaderNames.WWW_AUTHENTICATE, BearerSchemeName),
-      error
+      extract = headers => headers.bearerToken,
+      verify  = verify,
+      headers = Headers(HttpHeaderNames.WWW_AUTHENTICATE, BearerSchemeName),
+      error   = error
     )
 
   private def customAuthMiddleware[R, E, A, Cred](
@@ -39,7 +39,7 @@ object AuthMiddleware {
     error: E
   ): Middleware[R, E, AuthContext[A], Response, Request, Response] =
     authMiddleware(
-      extract(_) match {
+      headers => extract(headers) match {
         case Some(credentials) => verify(credentials)
         case None => ZIO.fail(error)
       },
