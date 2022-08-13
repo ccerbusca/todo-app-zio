@@ -7,6 +7,7 @@ import repos.todo.TodoRepo
 import zhttp.http.*
 import zio.*
 import zio.json.*
+import auth.*
 
 import java.util.UUID
 
@@ -38,14 +39,12 @@ object TodoService {
     ZIO.serviceWithZIO[TodoService](_.get(id))
 
   val endpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {
-    case AuthContext(req, user) => req match {
-      case req@Method.POST -> !! / "todo" =>
-        for {
-          body <- req.bodyAsString
-          todoDTO <- ZIO.fromEither(body.fromJson[AddTodo])
-            .mapError(new RuntimeException(_))
-          todo <- TodoService.add(todoDTO, user)
-        } yield Response.json(todo.toJson)
-    }
+    case (req@Method.POST -> !! / "todo") $$ user =>
+      for {
+        body <- req.bodyAsString
+        todoDTO <- ZIO.fromEither(body.fromJson[AddTodo])
+          .mapError(new RuntimeException(_))
+        todo <- TodoService.add(todoDTO, user)
+      } yield Response.json(todo.toJson)
   }
 }

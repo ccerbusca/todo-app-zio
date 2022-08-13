@@ -65,3 +65,7 @@ case class AuthContext[T](
   request: Request,
   contextInfo: T
 )
+object $$ {
+  def unapply[T](context: AuthContext[T]): Option[(Request, T)] =
+    Option(context.request, context.contextInfo)
+}
