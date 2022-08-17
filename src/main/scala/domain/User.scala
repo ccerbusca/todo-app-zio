@@ -8,8 +8,8 @@ import java.util.UUID
 case class User(
   username: String,
   password: String,
-  id: UUID
-) extends WithId[UUID]
+  id: Int
+) extends WithId[Int]
 
 object User {
   given encoder: JsonEncoder[User] = DeriveJsonEncoder.gen[User]

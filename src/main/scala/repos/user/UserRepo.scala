@@ -10,7 +10,7 @@ import zio.*
 
 import java.util.UUID
 
-trait UserRepo extends Repo[User, UUID] {
+trait UserRepo extends Repo[User, Int] {
   def findByUsername(username: String): Task[User]
 }
 
@@ -18,10 +18,10 @@ object UserRepo {
   val live: URLayer[Quill[PostgresDialect, SnakeCase], UserRepo] =
     ZLayer.fromFunction(UserRepoLive.apply)
 
-  val inMemory: URLayer[InMemoryRepo[User, UUID], UserRepo] =
+  val inMemory: URLayer[InMemoryRepo[User, Int], UserRepo] =
     ZLayer.fromFunction(UserRepoInMemory.apply)
 
-  def get(id: UUID): ZIO[UserRepo, Throwable, User] =
+  def get(id: Int): ZIO[UserRepo, Throwable, User] =
     ZIO.serviceWithZIO(_.get(id))
 
   def add(entity: User): ZIO[UserRepo, Throwable, User] =

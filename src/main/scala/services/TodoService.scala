@@ -8,34 +8,35 @@ import zhttp.http.*
 import zio.*
 import zio.json.*
 import auth.*
+import services.generators.IdGenerator
 
 import java.util.UUID
 
 trait TodoService {
-  def get(id: UUID): Task[Todo]
+  def get(id: Int): Task[Todo]
   def add(todoDTO: AddTodo, user: User): Task[Todo]
 }
 
-case class TodoServiceLive(todoRepo: TodoRepo) extends TodoService {
-  override def get(id: UUID): Task[Todo] =
+case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) extends TodoService {
+  override def get(id: Int): Task[Todo] =
     todoRepo.get(id)
 
   override def add(todoDTO: AddTodo, user: User): Task[Todo] =
     for {
-      uuid <- Random.nextUUID
-      newTodo = Todo(todoDTO.title, todoDTO.content, uuid, user.id)
+      id <- idGenerator.generate
+      newTodo = Todo(todoDTO.title, todoDTO.content, id, user.id)
       todo <- todoRepo.add(newTodo)
     } yield todo
 }
 
 object TodoService {
-  val live: URLayer[TodoRepo, TodoService] =
+  val live: URLayer[TodoRepo & IdGenerator[Int], TodoService] =
     ZLayer.fromFunction(TodoServiceLive.apply)
 
   def add(todoDTO: AddTodo, user: User): RIO[TodoService, Todo] =
     ZIO.serviceWithZIO[TodoService](_.add(todoDTO, user))
 
-  def get(id: UUID): RIO[TodoService, Todo] =
+  def get(id: Int): RIO[TodoService, Todo] =
     ZIO.serviceWithZIO[TodoService](_.get(id))
 
   val endpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {

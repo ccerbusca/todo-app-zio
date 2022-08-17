@@ -5,7 +5,7 @@ import repos.user.{UserRepoInMemory, UserRepoLive}
 import zio.concurrent.ConcurrentMap
 import zio.test.*
 import zio.test.Assertion.*
-import zio.{Ref, ZIO}
+import zio.*
 
 import java.util.UUID
 
@@ -14,16 +14,17 @@ object UserRepoSpec extends ZIOSpecDefault {
     suite("UserRepoSpec") {
       test("Repo adds user correctly") {
         for {
-          map <- ConcurrentMap.empty[UUID, User]
-          inMemory: InMemoryRepo[User, UUID] = InMemoryRepoLive[User, UUID](map)
+          map <- ConcurrentMap.empty[Int, User]
+          inMemory: InMemoryRepo[User, Int] = InMemoryRepoLive[User, Int](map)
           repo = UserRepoInMemory(inMemory)
-          uuid <- zio.Random.nextUUID
-          _ <- TestRandom.feedUUIDs(uuid)
-          newUser = User("test", "test", uuid)
+
+          id <- Random.nextInt
+          newUser = User("test", "test", id)
           _ <- repo.add(newUser)
-          user <- repo.get(uuid)
-          exists <- map.exists((k, _) => k == uuid)
-        } yield assertTrue(User("test", "test", uuid) == user && exists)
+
+          user <- repo.get(id)
+          exists <- map.exists((k, _) => k == id)
+        } yield assertTrue(User("test", "test", id) == user && exists)
       }
     }
 }

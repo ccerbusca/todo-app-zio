@@ -13,6 +13,7 @@ import zhttp.service.*
 import zio.*
 import zio.concurrent.ConcurrentMap
 import domain.errors.CustomError.MissingCredentials
+import services.generators.IdGenerator
 
 import java.io.IOException
 import java.util.UUID
@@ -48,10 +49,11 @@ object Main extends ZIOAppDefault {
         UserService.live,
         TodoService.live,
 //        InMemoryRepo.live[User, UUID],
-        InMemoryRepo.live[Todo, UUID],
+        InMemoryRepo.live[Todo, Int],
 //        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User]),
-        ZLayer.fromZIO(ConcurrentMap.empty[UUID, Todo]),
+        ZLayer.fromZIO(ConcurrentMap.empty[Int, Todo]),
         Quill.Postgres.fromNamingStrategy(SnakeCase),
-        Quill.DataSource.fromPrefix("myDatabaseConfig")
+        Quill.DataSource.fromPrefix("myDatabaseConfig"),
+        IdGenerator.int
       )
 }

@@ -7,13 +7,13 @@ import zio.*
 
 import java.util.UUID
 
-trait TodoRepo extends Repo[Todo, UUID]
+trait TodoRepo extends Repo[Todo, Int]
 
 object TodoRepo {
-  val inMemory: URLayer[InMemoryRepo[Todo, UUID], TodoRepoInMemory] =
+  val inMemory: URLayer[InMemoryRepo[Todo, Int], TodoRepoInMemory] =
     ZLayer.fromFunction(TodoRepoInMemory.apply)
 
-  def get(id: UUID): RIO[TodoRepo, Todo] =
+  def get(id: Int): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.get(id))
 
   def add(todo: Todo): RIO[TodoRepo, Todo] =

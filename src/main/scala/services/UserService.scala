@@ -3,6 +3,7 @@ package services
 import domain.User
 import domain.dto.UserRegister
 import repos.user.UserRepo
+import services.generators.IdGenerator
 import zhttp.http.*
 import zio.*
 import zio.json.*
@@ -10,19 +11,19 @@ import zio.json.*
 import java.util.UUID
 
 trait UserService {
-  def get(id: UUID): Task[User]
+  def get(id: Int): Task[User]
   def add(registerDTO: UserRegister): Task[User]
   def findByUsername(username: String): Task[User]
 }
 
-case class UserServiceLive(userRepo: UserRepo) extends UserService {
-  override def get(id: UUID): Task[User] =
+case class UserServiceLive(userRepo: UserRepo, idGenerator: IdGenerator[Int]) extends UserService {
+  override def get(id: Int): Task[User] =
     userRepo.get(id)
 
   override def add(registerDTO: UserRegister): Task[User] =
     for {
-      uuid <- Random.nextUUID
-      newUser = User(registerDTO.username, registerDTO.password, uuid)
+      id <- idGenerator.generate
+      newUser = User(registerDTO.username, registerDTO.password, id)
       user <- userRepo.add(newUser)
     } yield user
 
@@ -31,13 +32,13 @@ case class UserServiceLive(userRepo: UserRepo) extends UserService {
 }
 
 object UserService {
-  val live: URLayer[UserRepo, UserService] =
+  val live: URLayer[UserRepo & IdGenerator[Int], UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
 
   def add(registerDTO: UserRegister): RIO[UserService, User] =
     ZIO.serviceWithZIO[UserService](_.add(registerDTO))
 
-  def get(id: UUID): ZIO[UserService, Throwable, User] =
+  def get(id: Int): ZIO[UserService, Throwable, User] =
     ZIO.serviceWithZIO[UserService](_.get(id))
 
   val endpoints: HttpApp[UserService, Throwable] = Http.collectZIO[Request] {
