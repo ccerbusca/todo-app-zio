@@ -9,6 +9,7 @@ import java.util.UUID
 
 trait InMemoryRepo[T <: WithId[ID], ID] extends Repo[T, ID] {
   def find(pred: T => Boolean): Task[T]
+  def filter(pred: T => Boolean): Task[List[T]]
 }
 
 case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID, T]) extends InMemoryRepo[T, ID] {
@@ -26,6 +27,11 @@ case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID
     concurrentMap
       .collectFirst { case (_, v) if pred(v) => v }
       .someOrFail(NotFound)
+
+  override def filter(pred: T => Boolean): Task[List[T]] =
+    concurrentMap
+      .toList
+      .map(_.map(_._2).filter(pred))
 }
 
 object InMemoryRepo {

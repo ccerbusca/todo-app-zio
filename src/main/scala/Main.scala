@@ -36,7 +36,7 @@ object Main extends ZIOAppDefault {
       }
 
   val securedEndpoints: HttpApp[AuthService & TodoService, Throwable] =
-    TodoService.endpoints @@ customBasicAuth
+    TodoService.secureEndpoints @@ customBasicAuth
 
   override def run: Task[Nothing] =
     Server

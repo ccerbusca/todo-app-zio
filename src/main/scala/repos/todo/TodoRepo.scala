@@ -7,7 +7,9 @@ import zio.*
 
 import java.util.UUID
 
-trait TodoRepo extends Repo[Todo, Int]
+trait TodoRepo extends Repo[Todo, Int] {
+  def findAllByParentId(parentId: Int): Task[List[Todo]]
+}
 
 object TodoRepo {
   val inMemory: URLayer[InMemoryRepo[Todo, Int], TodoRepoInMemory] =

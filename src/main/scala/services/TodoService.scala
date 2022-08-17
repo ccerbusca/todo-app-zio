@@ -15,6 +15,8 @@ import java.util.UUID
 trait TodoService {
   def get(id: Int): Task[Todo]
   def add(todoDTO: AddTodo, user: User): Task[Todo]
+
+  def allForUser(user: User): Task[List[Todo]]
 }
 
 case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) extends TodoService {
@@ -27,6 +29,9 @@ case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) ex
       newTodo = Todo(todoDTO.title, todoDTO.content, id, user.id)
       todo <- todoRepo.add(newTodo)
     } yield todo
+
+  override def allForUser(user: User): Task[List[Todo]] =
+    todoRepo.findAllByParentId(user.id)
 }
 
 object TodoService {
@@ -39,7 +44,10 @@ object TodoService {
   def get(id: Int): RIO[TodoService, Todo] =
     ZIO.serviceWithZIO[TodoService](_.get(id))
 
-  val endpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {
+  def allForUser(user: User): RIO[TodoService, List[Todo]] =
+    ZIO.serviceWithZIO[TodoService](_.allForUser(user))
+
+  val secureEndpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {
     case (req@Method.POST -> !! / "todo") $$ user =>
       for {
         body <- req.bodyAsString
@@ -47,5 +55,9 @@ object TodoService {
           .mapError(new RuntimeException(_))
         todo <- TodoService.add(todoDTO, user)
       } yield Response.json(todo.toJson)
+    case Method.POST -> !! / "todos" $$ user =>
+      TodoService
+        .allForUser(user)
+        .map(todos => Response.json(todos.toJson))
   }
 }

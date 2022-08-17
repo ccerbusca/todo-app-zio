@@ -13,4 +13,7 @@ case class TodoRepoInMemory(inMemoryRepo: InMemoryRepo[Todo, Int]) extends TodoR
 
   override def add(todo: Todo): Task[Todo] =
     inMemoryRepo.add(todo)
+
+  override def findAllByParentId(parentId: Int): Task[List[Todo]] =
+    inMemoryRepo.filter(_.parentId == parentId)
 }

@@ -10,7 +10,7 @@ case class Todo(
   content: String,
   id: Int,
   parentId: Int
-) extends WithId[Int] with One[User, Int]
+) extends WithId[Int] with One[User, User.ID]
 
 object Todo {
   given jsonEncoder: JsonEncoder[Todo] = DeriveJsonEncoder.gen[Todo]

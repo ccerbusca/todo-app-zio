@@ -12,6 +12,7 @@ import java.util.UUID
 
 case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
   import quill._
+  given userSchemaMeta: SchemaMeta[User] = schemaMeta[User]("users")
   override def get(id: Int): Task[User] =
     run(query[User].filter(_.id == lift(id)))
       .map(_.headOption)

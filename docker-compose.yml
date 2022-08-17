@@ -9,8 +9,8 @@ services:
     ports:
       - 15432:5432
     volumes:
-      - ./src/main/resources/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
-      #- postgres-data:/var/lib/postgresql/data
+      #- ./src/main/resources/db/migrations/v1.sql:/docker-entrypoint-initdb.d/v1.sql
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
   postgres-data:
