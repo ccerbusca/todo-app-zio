@@ -1,4 +1,5 @@
 package services
+import auth.PasswordEncoder
 import domain.User
 import domain.dto.UserAuthenticate
 import domain.errors.CustomError.*
@@ -9,15 +10,15 @@ trait AuthService {
   def authenticate(user: UserAuthenticate): ZIO[Any, Throwable, User]
 }
 
-case class AuthServiceLive(userRepo: UserRepo) extends AuthService {
+case class AuthServiceLive(userRepo: UserRepo, passwordEncoder: PasswordEncoder) extends AuthService {
   override def authenticate(authDTO: UserAuthenticate): ZIO[Any, Throwable, User] =
     userRepo
       .findByUsername(authDTO.username)
-      .filterOrFail(_.password == authDTO.password)(WrongAuthInfo)
+      .filterOrFail(user => passwordEncoder.verify(authDTO.password, user.password))(WrongAuthInfo)
 }
 
 object AuthService {
-  val live: ZLayer[UserRepo, Nothing, AuthServiceLive] =
+  val live: ZLayer[UserRepo & PasswordEncoder, Nothing, AuthServiceLive] =
     ZLayer.fromFunction(AuthServiceLive.apply)
 
   def authenticate(authDTO: UserAuthenticate): ZIO[AuthService, Throwable, User] =

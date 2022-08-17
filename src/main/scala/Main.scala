@@ -1,4 +1,4 @@
-import auth.{AuthContext, AuthMiddleware}
+import auth.{AuthContext, AuthMiddleware, PasswordEncoder}
 import domain.{Todo, User}
 import domain.dto.UserAuthenticate
 import io.getquill.SnakeCase
@@ -53,7 +53,8 @@ object Main extends ZIOAppDefault {
 //        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User]),
         ZLayer.fromZIO(ConcurrentMap.empty[Int, Todo]),
         Quill.Postgres.fromNamingStrategy(SnakeCase),
-        Quill.DataSource.fromPrefix("myDatabaseConfig"),
-        IdGenerator.int
+        Quill.DataSource.fromPrefix("postgresConfig"),
+        IdGenerator.int,
+        PasswordEncoder.live
       )
 }

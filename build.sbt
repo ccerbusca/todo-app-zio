@@ -20,7 +20,8 @@ lazy val root = (project in file("."))
       "io.d11"           %% "zhttp-test"         % "2.0.0-RC9" % Test,
       "io.getquill"      %% "quill-jdbc-zio"     % "4.2.0",
       "com.github.ksuid"  % "ksuid"              % "1.1.1",
-      "org.postgresql"    % "postgresql"         % "42.4.1"
+      "org.postgresql"    % "postgresql"         % "42.4.1",
+      "com.password4j"    % "password4j"         % "1.6.0"
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scalacOptions += "-no-indent"

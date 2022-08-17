@@ -1,5 +1,6 @@
 package services
 
+import auth.PasswordEncoder
 import domain.User
 import domain.dto.UserRegister
 import repos.user.UserRepo
@@ -16,14 +17,18 @@ trait UserService {
   def findByUsername(username: String): Task[User]
 }
 
-case class UserServiceLive(userRepo: UserRepo, idGenerator: IdGenerator[Int]) extends UserService {
+case class UserServiceLive(
+  userRepo: UserRepo,
+  idGenerator: IdGenerator[Int],
+  passwordEncoder: PasswordEncoder
+) extends UserService {
   override def get(id: Int): Task[User] =
     userRepo.get(id)
 
   override def add(registerDTO: UserRegister): Task[User] =
     for {
       id <- idGenerator.generate
-      newUser = User(registerDTO.username, registerDTO.password, id)
+      newUser = User(registerDTO.username, passwordEncoder.encode(registerDTO.password), id)
       user <- userRepo.add(newUser)
     } yield user
 
@@ -32,7 +37,7 @@ case class UserServiceLive(userRepo: UserRepo, idGenerator: IdGenerator[Int]) ex
 }
 
 object UserService {
-  val live: URLayer[UserRepo & IdGenerator[Int], UserService] =
+  val live: URLayer[UserRepo & IdGenerator[Int] & PasswordEncoder, UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
 
   def add(registerDTO: UserRegister): RIO[UserService, User] =
