@@ -2,6 +2,8 @@ package repos.todo
 
 import domain.Todo
 import domain.dto.AddTodo
+import io.getquill.jdbczio.Quill
+import io.getquill.{PostgresDialect, SnakeCase}
 import repos.{InMemoryRepo, Repo}
 import zio.*
 
@@ -12,7 +14,10 @@ trait TodoRepo extends Repo[Todo, Int] {
 }
 
 object TodoRepo {
-  val inMemory: URLayer[InMemoryRepo[Todo, Int], TodoRepoInMemory] =
+  val live: URLayer[Quill[PostgresDialect, SnakeCase], TodoRepo] =
+    ZLayer.fromFunction(TodoRepoLive.apply)  
+  
+  val inMemory: URLayer[InMemoryRepo[Todo, Int], TodoRepo] =
     ZLayer.fromFunction(TodoRepoInMemory.apply)
 
   def get(id: Int): RIO[TodoRepo, Todo] =
