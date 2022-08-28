@@ -1,7 +1,7 @@
 create table users (
     id int primary key,
     username varchar(50) not null,
-    password varchar(60) not null
+    password varchar(255) not null
 );
 
 create table todo (

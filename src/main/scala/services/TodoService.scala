@@ -1,14 +1,13 @@
 package services
 
-import auth.AuthContext
-import domain.{Todo, User}
+import auth.*
 import domain.dto.AddTodo
+import domain.{Todo, User}
 import repos.todo.TodoRepo
+import services.generators.IdGenerator
 import zhttp.http.*
 import zio.*
 import zio.json.*
-import auth.*
-import services.generators.IdGenerator
 
 import java.util.UUID
 

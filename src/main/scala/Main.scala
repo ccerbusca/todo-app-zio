@@ -1,29 +1,24 @@
 import auth.{AuthContext, AuthMiddleware, PasswordEncoder}
-import domain.{Todo, User}
 import domain.dto.UserAuthenticate
+import domain.errors.CustomError.MissingCredentials
+import domain.{Todo, User}
 import io.getquill.SnakeCase
+import io.getquill.jdbczio.Quill
 import repos.InMemoryRepo
 import repos.todo.TodoRepo
 import repos.user.UserRepo
-import io.getquill.jdbczio.Quill
+import services.generators.IdGenerator
 import services.{AuthService, TodoService, UserService}
 import zhttp.http.*
 import zhttp.http.middleware.HttpMiddleware
 import zhttp.service.*
 import zio.*
 import zio.concurrent.ConcurrentMap
-import domain.errors.CustomError.MissingCredentials
-import services.generators.IdGenerator
 
 import java.io.IOException
 import java.util.UUID
 
 object Main extends ZIOAppDefault {
-  val authMiddleware: HttpMiddleware[AuthService, Nothing] =
-    Middleware.basicAuthZIO { credentials =>
-      AuthService.authenticate(UserAuthenticate.fromCredentials(credentials)).isSuccess
-    }
-    
   val customBasicAuth: Middleware[AuthService, Throwable, AuthContext[User], Response, Request, Response] =
     AuthMiddleware.customBasicAuth(MissingCredentials) { credentials =>
       AuthService.authenticate(UserAuthenticate.fromCredentials(credentials))
@@ -44,15 +39,9 @@ object Main extends ZIOAppDefault {
       .provide(
         UserRepo.live,
         TodoRepo.live,
-//        UserRepo.inMemory,
-//        TodoRepo.inMemory,
         AuthService.live,
         UserService.live,
         TodoService.live,
-//        InMemoryRepo.live[User, UUID],
-//        InMemoryRepo.live[Todo, Int],
-//        ZLayer.fromZIO(ConcurrentMap.empty[UUID, User]),
-//        ZLayer.fromZIO(ConcurrentMap.empty[Int, Todo]),
         Quill.Postgres.fromNamingStrategy(SnakeCase),
         Quill.DataSource.fromPrefix("postgresConfig"),
         IdGenerator.int,

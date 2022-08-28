@@ -15,12 +15,12 @@ lazy val root = (project in file("."))
       "dev.zio"          %% "zio-test"           % zioVersion % Test,
       "dev.zio"          %% "zio-test-sbt"       % zioVersion % Test,
       "dev.zio"          %% "zio-test-magnolia"  % zioVersion % Test,
-      "dev.zio"          %% "zio-json"           % "0.3.0-RC10",
+      "dev.zio"          %% "zio-json"           % "0.3.0-RC11",
       "io.d11"           %% "zhttp"              % "2.0.0-RC10",
       "io.d11"           %% "zhttp-test"         % "2.0.0-RC9" % Test,
-      "io.getquill"      %% "quill-jdbc-zio"     % "4.2.0",
+      "io.getquill"      %% "quill-jdbc-zio"     % "4.3.0",
       "com.github.ksuid"  % "ksuid"              % "1.1.1",
-      "org.postgresql"    % "postgresql"         % "42.4.1",
+      "org.postgresql"    % "postgresql"         % "42.4.2",
       "com.password4j"    % "password4j"         % "1.6.0"
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
@@ -31,12 +31,19 @@ lazy val root = (project in file("."))
 //Flyway configuration
 enablePlugins(FlywayPlugin)
 
-flywayLocations += "db/migrations"
+flywayLocations += "db/migration"
 
-flywayUrl := "jdbc:postgresql://localhost:15432/test?createDatabaseIfNotExist=true"
+flywayUrl := "jdbc:postgresql://localhost:15432/test"
 flywayUser := "postgres"
 flywayPassword := "admin"
 
 Test / flywayUrl := "jdbc:postgresql://localhost/test"
 Test / flywayUser := "postgres"
 Test / flywayPassword := "admin"
+
+//Dockerization
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
+
+Docker / maintainer := "ccerbusca"
+

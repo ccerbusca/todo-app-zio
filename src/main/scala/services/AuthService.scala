@@ -22,5 +22,5 @@ object AuthService {
     ZLayer.fromFunction(AuthServiceLive.apply)
 
   def authenticate(authDTO: UserAuthenticate): ZIO[AuthService, Throwable, User] =
-    ZIO.serviceWithZIO(_.authenticate(authDTO))
+    ZIO.serviceWithZIO[AuthService](_.authenticate(authDTO))
 }

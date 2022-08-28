@@ -1,10 +1,10 @@
 package repos.user
 
-import io.getquill.*
-import io.getquill.jdbczio.Quill
 import domain.User
 import domain.dto.UserRegister
 import domain.errors.CustomError.*
+import io.getquill.*
+import io.getquill.jdbczio.Quill
 import zio.*
 
 import java.sql.SQLException

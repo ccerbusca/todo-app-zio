@@ -53,6 +53,6 @@ object UserService {
         registerDTO <- ZIO.fromEither(body.fromJson[UserRegister])
           .mapError(new RuntimeException(_))
         userWithId <- UserService.add(registerDTO)
-      } yield Response.json(userWithId.toJson)
+      } yield Response.text("Successful registration")
   }
 }

@@ -23,6 +23,6 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
       .filterOrFail(_ > 0)(FailedInsert)
       .as(entity)
 
-  override def findAllByParentId(parentId: RuntimeFlags): Task[List[Todo]] =
+  override def findAllByParentId(parentId: Int): Task[List[Todo]] =
     run(query[Todo].filter(_.parentId == lift(parentId)))
 }
