@@ -2,7 +2,7 @@ package services
 
 import auth.PasswordEncoder
 import domain.User
-import domain.dto.UserRegister
+import domain.dto.request.UserRegister
 import repos.user.UserRepo
 import services.generators.IdGenerator
 import zhttp.http.*

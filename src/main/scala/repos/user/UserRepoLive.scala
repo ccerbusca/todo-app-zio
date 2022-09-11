@@ -1,7 +1,7 @@
 package repos.user
 
 import domain.User
-import domain.dto.UserRegister
+import domain.dto.request.UserRegister
 import domain.errors.CustomError.*
 import io.getquill.*
 import io.getquill.jdbczio.Quill

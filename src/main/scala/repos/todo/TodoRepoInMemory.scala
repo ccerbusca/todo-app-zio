@@ -1,7 +1,7 @@
 package repos.todo
 
 import domain.Todo
-import domain.dto.AddTodo
+import domain.dto.request.AddTodo
 import repos.InMemoryRepo
 import zio.{Random, Task}
 
@@ -16,4 +16,7 @@ case class TodoRepoInMemory(inMemoryRepo: InMemoryRepo[Todo, Int]) extends TodoR
 
   override def findAllByParentId(parentId: Int): Task[List[Todo]] =
     inMemoryRepo.filter(_.parentId == parentId)
+
+  override def markCompleted(id: Int): Task[Todo] =
+    inMemoryRepo.update(id, _.copy(completed = true))
 }

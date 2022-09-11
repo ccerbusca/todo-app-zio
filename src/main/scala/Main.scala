@@ -1,5 +1,5 @@
 import auth.{AuthContext, AuthMiddleware, PasswordEncoder}
-import domain.dto.UserAuthenticate
+import domain.dto.request.UserAuthenticate
 import domain.errors.CustomError.MissingCredentials
 import domain.{Todo, User}
 import io.getquill.SnakeCase

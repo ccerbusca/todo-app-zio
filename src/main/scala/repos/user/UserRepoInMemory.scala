@@ -1,7 +1,7 @@
 package repos.user
 
 import domain.User
-import domain.dto.UserRegister
+import domain.dto.request.UserRegister
 import repos.InMemoryRepo
 import zio.*
 

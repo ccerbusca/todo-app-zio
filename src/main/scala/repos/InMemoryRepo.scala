@@ -10,6 +10,8 @@ import java.util.UUID
 trait InMemoryRepo[T <: WithId[ID], ID] extends Repo[T, ID] {
   def find(pred: T => Boolean): Task[T]
   def filter(pred: T => Boolean): Task[List[T]]
+  
+  def update(id: ID, updateF: T => T): Task[T]
 }
 
 case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID, T]) extends InMemoryRepo[T, ID] {
@@ -32,6 +34,11 @@ case class InMemoryRepoLive[T <: WithId[ID], ID](concurrentMap: ConcurrentMap[ID
     concurrentMap
       .toList
       .map(_.map(_._2).filter(pred))
+
+  override def update(id: ID, updateF: T => T): Task[T] =
+    concurrentMap
+      .computeIfPresent(id, (_, v) => updateF(v))
+      .someOrFail(NotFound)
 }
 
 object InMemoryRepo {
@@ -45,4 +52,7 @@ object InMemoryRepo {
 
   def find[T <: WithId[ID] : Tag, ID: Tag](pred: T => Boolean): ZIO[InMemoryRepo[T, ID], Throwable, T] =
     ZIO.serviceWithZIO(_.find(pred))
+    
+  def update[T <: WithId[ID] : Tag, ID: Tag](id: ID, updateF: T => T): ZIO[InMemoryRepo[T, ID], Throwable, T] =
+    ZIO.serviceWithZIO(_.update(id, updateF))
 }

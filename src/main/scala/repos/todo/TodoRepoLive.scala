@@ -18,11 +18,23 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
 
   override def add(entity: Todo): Task[Todo] =
     run(quote(
-      query[Todo].insertValue(lift(entity))
+      query[Todo]
+        .insertValue(lift(entity))
+        .returning(r => r)
     ))
-      .filterOrFail(_ > 0)(FailedInsert)
-      .as(entity)
 
   override def findAllByParentId(parentId: Int): Task[List[Todo]] =
-    run(query[Todo].filter(_.parentId == lift(parentId)))
+    run(
+      query[Todo]
+        .filter(_.parentId == lift(parentId))
+    )
+
+  override def markCompleted(id: Int): Task[Todo] =
+    run(quote(
+      query[Todo]
+        .filter(_.id == lift(id))
+        .update(_.completed -> lift(true))
+        .returning(r => r)
+    ))
+
 }

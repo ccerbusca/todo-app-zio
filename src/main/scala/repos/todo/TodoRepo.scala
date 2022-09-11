@@ -1,7 +1,7 @@
 package repos.todo
 
 import domain.Todo
-import domain.dto.AddTodo
+import domain.dto.request.AddTodo
 import io.getquill.jdbczio.Quill
 import io.getquill.{PostgresDialect, SnakeCase}
 import repos.{InMemoryRepo, Repo}
@@ -11,6 +11,8 @@ import java.util.UUID
 
 trait TodoRepo extends Repo[Todo, Int] {
   def findAllByParentId(parentId: Int): Task[List[Todo]]
+  
+  def markCompleted(id: Int): Task[Todo]
 }
 
 object TodoRepo {

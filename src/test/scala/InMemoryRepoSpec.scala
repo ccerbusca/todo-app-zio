@@ -37,6 +37,17 @@ object InMemoryRepoSpec extends ZIOSpecDefault {
         )(
           fails(equalTo(NotFound))
         ).provideLayer(ZLayer.fromZIO(ConcurrentMap.empty[Int, TestObject].map(InMemoryRepoLive.apply)))
+      },
+
+      test("should update entity correctly") {
+        for {
+          map <- ConcurrentMap.empty[Int, TestObject]
+          repo = InMemoryRepoLive[TestObject, Int](map)
+          obj = TestObject("string", 2)
+          _ <- repo.add(obj)
+          _ <- repo.update(2, _.copy(content = "1234"))
+          found <- repo.find(_.id == 2)
+        } yield assertTrue(found.content == "1234")
       }
     )
 

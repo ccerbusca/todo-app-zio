@@ -1,5 +1,5 @@
 import domain.User
-import domain.dto.UserRegister
+import domain.dto.request.UserRegister
 import repos.{InMemoryRepo, InMemoryRepoLive}
 import repos.user.{UserRepoInMemory, UserRepoLive}
 import zio.concurrent.ConcurrentMap
