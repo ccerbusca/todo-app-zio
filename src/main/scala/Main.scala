@@ -35,16 +35,21 @@ object Main extends ZIOAppDefault {
 
   override def run: Task[Nothing] =
     Server
-      .start(port = 8080, http = (unsecureEndpoints ++ securedEndpoints) @@ Middleware.debug)
+      .start(
+        port = 8080,
+        http = (
+          unsecureEndpoints ++ securedEndpoints ++ Http.methodNotAllowed("Method not defined")
+        ) @@ Middleware.debug
+      )
       .provide(
         UserRepo.live,
         TodoRepo.live,
         AuthService.live,
         UserService.live,
         TodoService.live,
-        Quill.Postgres.fromNamingStrategy(SnakeCase),
-        Quill.DataSource.fromPrefix("postgresConfig"),
         IdGenerator.int,
-        PasswordEncoder.live
+        PasswordEncoder.live,
+        Quill.DataSource.fromPrefix("postgresConfig"),
+        Quill.Postgres.fromNamingStrategy(SnakeCase),
       )
 }

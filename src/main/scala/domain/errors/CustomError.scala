@@ -6,4 +6,5 @@ enum CustomError extends RuntimeException {
   case FailedInsert extends CustomError
   case MissingCredentials extends CustomError
   case MissingToken extends CustomError
+  case Unauthorized extends CustomError
 }

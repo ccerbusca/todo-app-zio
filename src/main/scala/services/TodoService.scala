@@ -3,6 +3,7 @@ package services
 import auth.*
 import domain.dto.request.AddTodo
 import domain.{Todo, User}
+import domain.errors.CustomError.Unauthorized
 import repos.todo.TodoRepo
 import services.generators.IdGenerator
 import zhttp.http.*
@@ -17,6 +18,7 @@ trait TodoService {
   def add(todoDTO: AddTodo, user: User): Task[Todo]
   def allForUser(user: User): Task[List[Todo]]
   def markCompleted(id: Int): Task[Todo]
+  def ownedBy(id: Int, user: User): Task[Unit]
 }
 
 case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) extends TodoService {
@@ -31,11 +33,15 @@ case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) ex
     } yield todo
 
   override def allForUser(user: User): Task[List[Todo]] =
-    todoRepo.findAllByParentId(user.id)
+    todoRepo.findAllByUserId(user.id)
 
   override def markCompleted(id: Int): Task[Todo] =
     todoRepo.markCompleted(id)
 
+  override def ownedBy(id: Int, user: User): Task[Unit] =
+    todoRepo
+      .ownedBy(id, user.id)
+      .flatMap(if (_) ZIO.succeed(()) else ZIO.fail(Unauthorized))
 }
 
 object TodoService {
@@ -54,6 +60,9 @@ object TodoService {
   def markCompleted(id: Int): RIO[TodoService, Todo] =
     ZIO.serviceWithZIO(_.markCompleted(id))
 
+  def ownedBy(id: Int, user: User): RIO[TodoService, Unit] =
+    ZIO.serviceWithZIO[TodoService](_.ownedBy(id, user))
+
   val secureEndpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {
     case (req@Method.POST -> !! / "todo") $$ user =>
       for {
@@ -67,8 +76,14 @@ object TodoService {
         .allForUser(user)
         .map(todos => Response.json(todos.toJson))
     case Method.POST -> !! / "todo" / int(id) $$ user =>
-      TodoService
-        .markCompleted(id)
-        .map(entity => Response.json(entity.toJson))
+      TodoService.ownedBy(id, user) *>
+        TodoService
+          .markCompleted(id)
+          .map(entity => Response.json(entity.toJson))
+    case Method.GET -> !! / "todo" / int(id) $$ user =>
+      TodoService.ownedBy(id, user) *>
+        TodoService
+          .get(id)
+          .map(entity => Response.json(entity.toJson))
   }
 }

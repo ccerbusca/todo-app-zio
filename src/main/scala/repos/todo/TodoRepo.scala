@@ -10,9 +10,10 @@ import zio.*
 import java.util.UUID
 
 trait TodoRepo extends Repo[Todo, Int] {
-  def findAllByParentId(parentId: Int): Task[List[Todo]]
-  
+  def findAllByUserId(userId: Int): Task[List[Todo]]
   def markCompleted(id: Int): Task[Todo]
+  def ownedBy(id: Int, userId: Int): Task[Boolean] =
+    get(id).map(_.parentId == userId)
 }
 
 object TodoRepo {
