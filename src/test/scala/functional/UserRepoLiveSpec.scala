@@ -7,6 +7,8 @@ import io.getquill.jdbczio.Quill.Postgres
 import io.github.scottweaver.zio.aspect.DbMigrationAspect
 import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
 import repos.user.UserRepo
+import services.generators.IdGenerator
+import testinstances.UserGenerator
 import unit.InMemoryRepoSpec.TestObject
 import zio.*
 import zio.test.*
@@ -17,21 +19,22 @@ object UserRepoLiveSpec extends ZIOSpecDefault {
 
       test("User should be correctly added") {
         for {
-          inserted <- UserRepo.add(User("123", "456", 1))
-        } yield assertTrue(User("123", "456", 1) == inserted)
+          user <- UserGenerator.generate
+          inserted <- UserRepo.add(user)
+        } yield assertTrue(user == inserted)
       },
 
       test("User should be correctly fetched by id") {
         for {
-          inserted <- UserRepo.add(User("123", "456", 2))
-          fetched <- UserRepo.get(2)
+          inserted <- UserGenerator.generate.flatMap(UserRepo.add)
+          fetched <- UserRepo.get(inserted.id)
         } yield assertTrue(fetched == inserted)
       },
 
       test("User should be correctly fetched by username") {
         for {
-          inserted <- UserRepo.add(User("username", "456", 3))
-          fetched <- UserRepo.findByUsername("username")
+          inserted <- UserGenerator.generate.flatMap(UserRepo.add)
+          fetched <- UserRepo.findByUsername(inserted.username)
         } yield assertTrue(fetched == inserted)
       }
 
@@ -39,6 +42,8 @@ object UserRepoLiveSpec extends ZIOSpecDefault {
 
     ) @@ DbMigrationAspect.migrate()())
       .provide(
+        IdGenerator.int(),
+        UserGenerator.instance,
         UserRepo.live,
         ZPostgreSQLContainer.Settings.default,
         ZPostgreSQLContainer.live,
