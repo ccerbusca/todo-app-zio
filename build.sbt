@@ -21,11 +21,15 @@ lazy val root = (project in file("."))
       "io.getquill"      %% "quill-jdbc-zio"     % "4.4.0",
       "com.github.ksuid"  % "ksuid"              % "1.1.1",
       "org.postgresql"    % "postgresql"         % "42.5.0",
-      "com.password4j"    % "password4j"         % "1.6.0"
+      "com.password4j"    % "password4j"         % "1.6.0",
+      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % "0.8.0" % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % "0.8.0" % Test,
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scalacOptions += "-no-indent"
   )
+
+Test / fork := true
 
 
 //Flyway configuration

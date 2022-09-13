@@ -1,11 +1,12 @@
-import auth.*
-import zhttp.http.middleware.Auth.Credentials
-import zio.test.*
-import zio.test.Assertion.*
-import zio.*
-import zhttp.service.*
-import zhttp.http.*
+package unit
 
+import auth.{$$, AuthContext, AuthMiddleware}
+import unit.AuthMiddlewareSpec.{suite, suiteAll, test}
+import zhttp.http.*
+import zhttp.http.middleware.Auth.Credentials
+import zio.ZIO
+import zio.test.Assertion.equalTo
+import zio.test.{ZIOSpecDefault, assertZIO}
 
 object AuthMiddlewareSpec extends ZIOSpecDefault {
 

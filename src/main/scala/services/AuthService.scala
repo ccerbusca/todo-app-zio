@@ -2,7 +2,7 @@ package services
 import auth.PasswordEncoder
 import domain.User
 import domain.dto.request.UserAuthenticate
-import domain.errors.CustomError.*
+import domain.errors.ApiError.*
 import repos.user.UserRepo
 import zio.*
 

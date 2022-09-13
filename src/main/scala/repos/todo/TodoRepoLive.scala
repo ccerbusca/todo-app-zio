@@ -1,10 +1,10 @@
 package repos.todo
 
 import domain.Todo
+import domain.errors.ApiError.*
 import io.getquill.*
 import io.getquill.jdbczio.Quill
 import zio.*
-import domain.errors.CustomError.*
 
 case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRepo {
   import quill.*

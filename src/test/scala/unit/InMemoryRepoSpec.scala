@@ -1,12 +1,13 @@
-import domain.errors.CustomError.NotFound
-import domain.{User, WithId}
-import repos.{InMemoryRepo, InMemoryRepoLive}
-import zio.*
-import zio.concurrent.ConcurrentMap
-import zio.test.*
-import zio.test.Assertion.*
+package unit
 
-import java.util.UUID
+import domain.WithId
+import domain.errors.ApiError.NotFound
+import repos.{InMemoryRepo, InMemoryRepoLive}
+import unit.InMemoryRepoSpec.{suite, test}
+import zio.ZLayer
+import zio.concurrent.ConcurrentMap
+import zio.test.Assertion.{equalTo, fails}
+import zio.test.{ZIOSpecDefault, assertTrue, assertZIO}
 
 object InMemoryRepoSpec extends ZIOSpecDefault {
   override def spec =

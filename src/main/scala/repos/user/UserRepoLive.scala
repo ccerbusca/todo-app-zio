@@ -2,7 +2,7 @@ package repos.user
 
 import domain.User
 import domain.dto.request.UserRegister
-import domain.errors.CustomError.*
+import domain.errors.ApiError.*
 import io.getquill.*
 import io.getquill.jdbczio.Quill
 import zio.*

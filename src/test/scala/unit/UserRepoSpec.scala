@@ -1,13 +1,12 @@
-import domain.User
-import domain.dto.request.UserRegister
-import repos.{InMemoryRepo, InMemoryRepoLive}
-import repos.user.{UserRepoInMemory, UserRepoLive}
-import zio.concurrent.ConcurrentMap
-import zio.test.*
-import zio.test.Assertion.*
-import zio.*
+package unit
 
-import java.util.UUID
+import domain.User
+import repos.user.UserRepoInMemory
+import repos.{InMemoryRepo, InMemoryRepoLive}
+import unit.UserRepoSpec.{suite, test}
+import zio.Random
+import zio.concurrent.ConcurrentMap
+import zio.test.{ZIOSpecDefault, assertTrue}
 
 object UserRepoSpec extends ZIOSpecDefault {
   override def spec =

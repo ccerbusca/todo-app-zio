@@ -11,7 +11,7 @@ trait IdGenerator[T] {
 }
 
 object IdGenerator {
-  val int: ULayer[IdGenerator[Int]] = ZLayer.succeed(IntGenerator())
+  def int(start: Int = 1): ULayer[IdGenerator[Int]] = IntGenerator.live(start)
   val uuid: ULayer[IdGenerator[UUID]] = ZLayer.succeed(UuidGenerator())
   val ksuid: URLayer[SecureRandom, IdGenerator[Ksuid]] = ZLayer.fromFunction(ZKsuidGenerator.apply)
   

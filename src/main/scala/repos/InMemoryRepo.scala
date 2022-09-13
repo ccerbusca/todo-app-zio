@@ -1,7 +1,7 @@
 package repos
 
 import domain.WithId
-import domain.errors.CustomError.*
+import domain.errors.ApiError.*
 import zio.*
 import zio.concurrent.ConcurrentMap
 

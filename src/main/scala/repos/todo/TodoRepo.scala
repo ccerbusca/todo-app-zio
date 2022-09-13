@@ -28,4 +28,13 @@ object TodoRepo {
 
   def add(todo: Todo): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.add(todo))
+
+  def markCompleted(id: Int): RIO[TodoRepo, Todo] =
+    ZIO.serviceWithZIO[TodoRepo](_.markCompleted(id))
+
+  def findAllByUserId(userId: Int): RIO[TodoRepo, List[Todo]] =
+    ZIO.serviceWithZIO[TodoRepo](_.findAllByUserId(userId))
+
+  def ownedBy(id: Int, userId: Int): RIO[TodoRepo, Boolean] =
+    ZIO.serviceWithZIO[TodoRepo](_.ownedBy(id, userId))
 }

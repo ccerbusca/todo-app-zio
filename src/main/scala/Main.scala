@@ -1,9 +1,9 @@
 import auth.{AuthContext, AuthMiddleware, PasswordEncoder}
 import domain.dto.request.UserAuthenticate
-import domain.errors.CustomError.MissingCredentials
+import domain.errors.ApiError.MissingCredentials
 import domain.{Todo, User}
-import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
+import io.getquill.{PostgresZioJdbcContext, SnakeCase}
 import repos.InMemoryRepo
 import repos.todo.TodoRepo
 import repos.user.UserRepo
@@ -24,7 +24,7 @@ object Main extends ZIOAppDefault {
       AuthService.authenticate(UserAuthenticate.fromCredentials(credentials))
     }
 
-  val unsecureEndpoints: HttpApp[UserService, Throwable] =
+  val publicEndpoints: HttpApp[UserService, Throwable] =
     UserService.endpoints ++
       Http.collect[Request] {
         case Method.GET -> !! / "test" => Response.text("123")
@@ -38,7 +38,7 @@ object Main extends ZIOAppDefault {
       .start(
         port = 8080,
         http = (
-          unsecureEndpoints ++ securedEndpoints ++ Http.methodNotAllowed("Method not defined")
+          publicEndpoints ++ securedEndpoints ++ Http.methodNotAllowed("Method not defined")
         ) @@ Middleware.debug
       )
       .provide(
@@ -47,7 +47,7 @@ object Main extends ZIOAppDefault {
         AuthService.live,
         UserService.live,
         TodoService.live,
-        IdGenerator.int,
+        IdGenerator.int(),
         PasswordEncoder.live,
         Quill.DataSource.fromPrefix("postgresConfig"),
         Quill.Postgres.fromNamingStrategy(SnakeCase),

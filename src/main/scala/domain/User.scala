@@ -13,5 +13,5 @@ case class User(
 
 object User {
   type ID = Int
-  given encoder: JsonEncoder[User] = DeriveJsonEncoder.gen[User]
+  given encoder: JsonEncoder[User] = JsonEncoder[String].contramap(_.username)
 }

@@ -2,12 +2,12 @@ package services
 
 import auth.*
 import domain.dto.request.AddTodo
+import domain.errors.ApiError.Unauthorized
 import domain.{Todo, User}
-import domain.errors.CustomError.Unauthorized
 import repos.todo.TodoRepo
 import services.generators.IdGenerator
-import zhttp.http.*
 import zhttp.*
+import zhttp.http.*
 import zio.*
 import zio.json.*
 

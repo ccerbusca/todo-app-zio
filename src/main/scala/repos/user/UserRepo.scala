@@ -2,7 +2,7 @@ package repos.user
 
 import domain.User
 import domain.dto.request.UserRegister
-import domain.errors.CustomError.*
+import domain.errors.ApiError.*
 import io.getquill.jdbczio.Quill
 import io.getquill.{PostgresDialect, SnakeCase}
 import repos.{InMemoryRepo, Repo}
@@ -26,5 +26,8 @@ object UserRepo {
 
   def add(entity: User): ZIO[UserRepo, Throwable, User] =
     ZIO.serviceWithZIO(_.add(entity))
+    
+  def findByUsername(username: String): RIO[UserRepo, User] =
+    ZIO.serviceWithZIO[UserRepo](_.findByUsername(username))
 }
 
