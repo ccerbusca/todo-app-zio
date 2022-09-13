@@ -1,9 +1,9 @@
 package testinstances
 
 import com.github.ksuid.Ksuid
-import services.generators.{IdGenerator, ZKsuidGenerator}
-import zio.test.*
+import services.generators.{Generator, ZKsuidGenerator}
 import zio.*
+import zio.test.*
 
 import java.security.SecureRandom
 
@@ -15,7 +15,7 @@ object TestIdGeneratorSpec extends ZIOSpecDefault {
         for {
           ksuid <- ZKsuidGenerator.newKsuid
           ksuid2 <- ZKsuidGenerator.newKsuid
-          _ <- TestIdGenerator.feedIds(ksuid, ksuid2)
+          _ <- TestGenerator.feedIds(ksuid, ksuid2)
           newKsuid <- ZKsuidGenerator.newKsuid
           newKsuid2 <- ZKsuidGenerator.newKsuid
           anotherKsuid <- ZKsuidGenerator.newKsuid
@@ -30,8 +30,8 @@ object TestIdGeneratorSpec extends ZIOSpecDefault {
       }
     ).provide(
       // Preserve this order to prevent circular dependency error (TestIdGenerator.test[Ksuid] needs IdGenerator.ksuid, while itself being a Ksuid generator)
-      IdGenerator.ksuid,
-      TestIdGenerator.test[Ksuid],
+      Generator.ksuid,
+      TestGenerator.test[Ksuid],
       ZLayer.succeed(new SecureRandom())
     )
 

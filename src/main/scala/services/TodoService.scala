@@ -5,7 +5,7 @@ import domain.dto.request.AddTodo
 import domain.errors.ApiError.Unauthorized
 import domain.{Todo, User}
 import repos.todo.TodoRepo
-import services.generators.IdGenerator
+import services.generators.Generator
 import zhttp.*
 import zhttp.http.*
 import zio.*
@@ -21,7 +21,7 @@ trait TodoService {
   def ownedBy(id: Int, user: User): Task[Unit]
 }
 
-case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) extends TodoService {
+case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: Generator[Int]) extends TodoService {
   override def get(id: Int): Task[Todo] =
     todoRepo.get(id)
 
@@ -45,7 +45,7 @@ case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: IdGenerator[Int]) ex
 }
 
 object TodoService {
-  val live: URLayer[TodoRepo & IdGenerator[Int], TodoService] =
+  val live: URLayer[TodoRepo & Generator[Int], TodoService] =
     ZLayer.fromFunction(TodoServiceLive.apply)
 
   def add(todoDTO: AddTodo, user: User): RIO[TodoService, Todo] =

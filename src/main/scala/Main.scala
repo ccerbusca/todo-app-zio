@@ -7,7 +7,7 @@ import io.getquill.{PostgresZioJdbcContext, SnakeCase}
 import repos.InMemoryRepo
 import repos.todo.TodoRepo
 import repos.user.UserRepo
-import services.generators.IdGenerator
+import services.generators.Generator
 import services.{AuthService, TodoService, UserService}
 import zhttp.http.*
 import zhttp.http.middleware.HttpMiddleware
@@ -47,7 +47,7 @@ object Main extends ZIOAppDefault {
         AuthService.live,
         UserService.live,
         TodoService.live,
-        IdGenerator.int(),
+        Generator.int(),
         PasswordEncoder.live,
         Quill.DataSource.fromPrefix("postgresConfig"),
         Quill.Postgres.fromNamingStrategy(SnakeCase),

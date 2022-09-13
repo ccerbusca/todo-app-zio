@@ -4,7 +4,7 @@ import auth.PasswordEncoder
 import domain.User
 import domain.dto.request.UserRegister
 import repos.user.UserRepo
-import services.generators.IdGenerator
+import services.generators.Generator
 import zhttp.http.*
 import zio.*
 import zio.json.*
@@ -19,7 +19,7 @@ trait UserService {
 
 case class UserServiceLive(
   userRepo: UserRepo,
-  idGenerator: IdGenerator[Int],
+  idGenerator: Generator[Int],
   passwordEncoder: PasswordEncoder
 ) extends UserService {
   override def get(id: Int): Task[User] =
@@ -37,7 +37,7 @@ case class UserServiceLive(
 }
 
 object UserService {
-  val live: URLayer[UserRepo & IdGenerator[Int] & PasswordEncoder, UserService] =
+  val live: URLayer[UserRepo & Generator[Int] & PasswordEncoder, UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
 
   def add(registerDTO: UserRegister): RIO[UserService, User] =

@@ -7,7 +7,7 @@ import io.getquill.jdbczio.Quill.Postgres
 import io.github.scottweaver.zio.aspect.DbMigrationAspect
 import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
 import repos.user.UserRepo
-import services.generators.IdGenerator
+import services.generators.Generator
 import testinstances.UserGenerator
 import unit.InMemoryRepoSpec.TestObject
 import zio.*
@@ -42,7 +42,7 @@ object UserRepoLiveSpec extends ZIOSpecDefault {
 
     ) @@ DbMigrationAspect.migrate()())
       .provide(
-        IdGenerator.int(),
+        Generator.int(),
         UserGenerator.instance,
         UserRepo.live,
         ZPostgreSQLContainer.Settings.default,

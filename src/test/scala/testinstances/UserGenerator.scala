@@ -1,10 +1,10 @@
 package testinstances
 
 import domain.User
-import services.generators.IdGenerator
+import services.generators.Generator
 import zio.*
 
-case class UserGenerator(private val intGenerator: IdGenerator[Int]) {
+case class UserGenerator(private val intGenerator: Generator[Int]) extends Generator[User] {
 
   def generate(username: String): UIO[User] =
     for {
@@ -18,7 +18,7 @@ case class UserGenerator(private val intGenerator: IdGenerator[Int]) {
 }
 
 object UserGenerator {
-  val instance: URLayer[IdGenerator[Int], UserGenerator] = ZLayer.fromFunction(UserGenerator.apply)
+  val instance: URLayer[Generator[Int], UserGenerator] = ZLayer.fromFunction(UserGenerator.apply)
 
   def generate(username: String): RIO[UserGenerator, User] =
     ZIO.serviceWithZIO[UserGenerator](_.generate(username))
