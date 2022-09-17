@@ -66,7 +66,7 @@ object TodoService {
   val secureEndpoints: Http[TodoService, Throwable, AuthContext[User], Response] = Http.collectZIO {
     case (req@Method.POST -> !! / "todo") $$ user =>
       for {
-        body <- req.bodyAsString
+        body <- req.body.asString
         todoDTO <- ZIO.fromEither(body.fromJson[AddTodo])
           .mapError(new RuntimeException(_))
         todo <- TodoService.add(todoDTO, user)

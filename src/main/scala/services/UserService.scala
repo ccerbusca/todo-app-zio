@@ -49,10 +49,10 @@ object UserService {
   val endpoints: HttpApp[UserService, Throwable] = Http.collectZIO[Request] {
     case req@Method.POST -> !! / "register" =>
       for {
-        body <- req.bodyAsString
+        body <- req.body.asString
         registerDTO <- ZIO.fromEither(body.fromJson[UserRegister])
           .mapError(new RuntimeException(_))
         userWithId <- UserService.add(registerDTO)
-      } yield Response.text("Successful registration")
+      } yield Response.json(userWithId.toJson)
   }
 }
