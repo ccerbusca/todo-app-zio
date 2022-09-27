@@ -30,7 +30,7 @@ object AuthMiddlewareSpec extends ZIOSpecDefault {
           case _ $$ context => Response.text(context)
         } @@ middleware
 
-        val bodyApp = testRoute.mapZIO(_.bodyAsString)
+        val bodyApp = testRoute.mapZIO(_.body.asString)
         val statusApp = testRoute.status
 
         test("context is passed on to route if basic auth succeeds") {
@@ -57,7 +57,7 @@ object AuthMiddlewareSpec extends ZIOSpecDefault {
           case _ $$ context => Response.text(context)
         } @@ middleware
 
-        val bodyApp = testRoute.mapZIO(_.bodyAsString)
+        val bodyApp = testRoute.mapZIO(_.body.asString)
         val statusApp = testRoute.status
 
         test("context is passed on to route if bearer auth succeeds") {

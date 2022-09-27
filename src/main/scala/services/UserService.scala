@@ -2,8 +2,8 @@ package services
 
 import auth.PasswordEncoder
 import domain.User
-import domain.dto.request.UserRegister
-import repos.user.UserRepo
+import domain.api.request.UserRegister
+import repos.UserRepo
 import services.generators.Generator
 import zhttp.http.*
 import zio.*

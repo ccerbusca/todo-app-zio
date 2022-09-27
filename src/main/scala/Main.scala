@@ -1,12 +1,11 @@
 import auth.{AuthContext, AuthMiddleware, PasswordEncoder}
-import domain.dto.request.UserAuthenticate
+import domain.api.request.UserAuthenticate
 import domain.errors.ApiError.MissingCredentials
 import domain.{Todo, User}
 import io.getquill.jdbczio.Quill
 import io.getquill.{PostgresZioJdbcContext, SnakeCase}
-import repos.InMemoryRepo
-import repos.todo.TodoRepo
-import repos.user.UserRepo
+import org.zalando.problem.{Problem, Status, ThrowableProblem}
+import repos.{TodoRepo, UserRepo}
 import services.generators.Generator
 import services.{AuthService, TodoService, UserService}
 import zhttp.http.*
@@ -23,6 +22,7 @@ object Main extends ZIOAppDefault {
     AuthMiddleware.customBasicAuth(MissingCredentials) { credentials =>
       AuthService.authenticate(UserAuthenticate.fromCredentials(credentials))
     }
+  private val problem: ThrowableProblem = Problem.valueOf(Status.SERVICE_UNAVAILABLE, "Database not reachable")
 
   val publicEndpoints: HttpApp[UserService, Throwable] =
     UserService.endpoints ++

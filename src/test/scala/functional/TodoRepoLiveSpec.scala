@@ -5,8 +5,7 @@ import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
 import io.github.scottweaver.zio.aspect.DbMigrationAspect
 import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
-import repos.todo.TodoRepo
-import repos.user.UserRepo
+import repos.{TodoRepo, UserRepo}
 import services.generators.{Generator, IntGenerator}
 import testinstances.*
 import zio.*

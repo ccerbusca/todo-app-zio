@@ -1,10 +1,10 @@
 package services
 
 import auth.*
-import domain.dto.request.AddTodo
+import domain.api.request.AddTodo
 import domain.errors.ApiError.Unauthorized
 import domain.{Todo, User}
-import repos.todo.TodoRepo
+import repos.TodoRepo
 import services.generators.Generator
 import zhttp.*
 import zhttp.http.*

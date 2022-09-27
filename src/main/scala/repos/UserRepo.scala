@@ -1,14 +1,18 @@
-package repos.user
+package repos
 
 import domain.User
-import domain.dto.request.UserRegister
+import domain.api.request.UserRegister
 import domain.errors.ApiError.*
 import io.getquill.*
 import io.getquill.jdbczio.Quill
+import repos.Repo
 import zio.*
 
-import java.sql.SQLException
 import java.util.UUID
+
+trait UserRepo extends Repo[User, Int] {
+  def findByUsername(username: String): Task[User]
+}
 
 case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
   import quill.*
@@ -33,3 +37,18 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
       .some
       .mapError(_.getOrElse(NotFound))
 }
+
+object UserRepo {
+  val live: URLayer[Quill[PostgresDialect, SnakeCase], UserRepo] =
+    ZLayer.fromFunction(UserRepoLive.apply)
+
+  def get(id: Int): ZIO[UserRepo, Throwable, User] =
+    ZIO.serviceWithZIO(_.get(id))
+
+  def add(entity: User): ZIO[UserRepo, Throwable, User] =
+    ZIO.serviceWithZIO(_.add(entity))
+    
+  def findByUsername(username: String): RIO[UserRepo, User] =
+    ZIO.serviceWithZIO[UserRepo](_.findByUsername(username))
+}
+

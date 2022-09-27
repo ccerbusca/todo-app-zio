@@ -1,9 +1,9 @@
 package services
 import auth.PasswordEncoder
 import domain.User
-import domain.dto.request.UserAuthenticate
+import domain.api.request.UserAuthenticate
 import domain.errors.ApiError.*
-import repos.user.UserRepo
+import repos.UserRepo
 import zio.*
 
 trait AuthService {

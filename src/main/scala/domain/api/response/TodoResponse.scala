@@ -1,4 +1,4 @@
-package domain.dto.response
+package domain.api.response
 
 import domain.Todo
 import zio.json.{DeriveJsonEncoder, JsonEncoder}

@@ -1,9 +1,7 @@
 package domain
 
-import domain.dto.response.TodoResponse
-import domain.relationships.{Many, One}
+import domain.api.response.{TodoResponse, toResponse}
 import zio.json.*
-import domain.dto.response.toResponse
 
 import java.util.UUID
 
@@ -13,7 +11,7 @@ case class Todo(
   title: String,
   content: String,
   completed: Boolean = false
-) extends WithId[Int] with One[User, User.ID]
+) extends WithId[Int]
 
 object Todo {
   given jsonEncoder: JsonEncoder[Todo] = JsonEncoder[TodoResponse].contramap(_.toResponse)

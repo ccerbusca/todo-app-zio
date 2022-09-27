@@ -1,4 +1,4 @@
-package domain.dto.request
+package domain.api.request
 
 import zhttp.http.middleware.Auth.Credentials
 
