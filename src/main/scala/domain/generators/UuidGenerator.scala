@@ -1,4 +1,4 @@
-package services.generators
+package domain.generators
 
 import zio.*
 
@@ -9,6 +9,8 @@ case class UuidGenerator() extends Generator[UUID] {
 }
 
 object UuidGenerator {
+
   def newUuid: RIO[Generator[UUID], UUID] =
     ZIO.serviceWithZIO[Generator[UUID]](_.generate)
+
 }

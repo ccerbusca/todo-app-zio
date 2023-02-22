@@ -1,7 +1,7 @@
 package testinstances
 
 import com.github.ksuid.Ksuid
-import services.generators.{Generator, ZKsuidGenerator}
+import domain.generators.{Generator, ZKsuidGenerator}
 import zio.*
 import zio.test.*
 

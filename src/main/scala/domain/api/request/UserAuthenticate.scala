@@ -1,10 +1,10 @@
 package domain.api.request
 
-import zhttp.http.middleware.Auth.Credentials
+import zio.http.middleware.Auth.Credentials
 
 case class UserAuthenticate(
-  username: String,
-  password: String
+    username: String,
+    password: String,
 )
 
 object UserAuthenticate {

@@ -1,12 +1,13 @@
 package domain.api.request
 
 import zio.json.*
+import zio.schema.{DeriveSchema, Schema}
 
 case class AddTodo(
-  title: String,
-  content: String,
-)
+    title: String,
+    content: String,
+) derives JsonDecoder
 
 object AddTodo {
-  given decoder: JsonDecoder[AddTodo] = DeriveJsonDecoder.gen[AddTodo]
+  given Schema[AddTodo] = DeriveSchema.gen
 }

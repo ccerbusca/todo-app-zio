@@ -1,4 +1,4 @@
-package services.generators
+package domain.generators
 
 import com.github.ksuid.{Ksuid, KsuidGenerator}
 import zio.*
@@ -12,6 +12,8 @@ case class ZKsuidGenerator(secureRandom: SecureRandom) extends Generator[Ksuid] 
 }
 
 object ZKsuidGenerator {
+
   def newKsuid: RIO[Generator[Ksuid], Ksuid] =
     ZIO.serviceWithZIO[Generator[Ksuid]](_.generate)
+
 }

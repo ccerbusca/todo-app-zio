@@ -1,7 +1,7 @@
 package testinstances
 
+import domain.generators.Generator
 import domain.{Todo, User}
-import services.generators.Generator
 import zio.*
 
 case class TodoGenerator(

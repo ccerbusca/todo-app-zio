@@ -9,6 +9,7 @@ trait PasswordEncoder {
 }
 
 case class PasswordEncoderLive() extends PasswordEncoder {
+
   override def encode(password: String): String =
     Password
       .hash(password)
@@ -20,14 +21,16 @@ case class PasswordEncoderLive() extends PasswordEncoder {
     Password
       .check(password, hashedPassword)
       .withArgon2()
+
 }
 
 object PasswordEncoder {
   val live: ULayer[PasswordEncoder] = ZLayer.succeed(PasswordEncoderLive())
-  
+
   def encode(password: String): RIO[PasswordEncoder, String] =
     ZIO.serviceWith[PasswordEncoder](_.encode(password))
 
   def verify(password: String, hashedPassword: String): RIO[PasswordEncoder, Boolean] =
     ZIO.serviceWith[PasswordEncoder](_.verify(password, hashedPassword))
+
 }

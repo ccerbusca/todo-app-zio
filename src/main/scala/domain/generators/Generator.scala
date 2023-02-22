@@ -1,4 +1,4 @@
-package services.generators
+package domain.generators
 
 import com.github.ksuid.{Ksuid, KsuidGenerator}
 import zio.*
@@ -11,10 +11,11 @@ trait Generator[T] {
 }
 
 object Generator {
-  def int(start: Int = 1): ULayer[Generator[Int]] = IntGenerator.live(start)
-  val uuid: ULayer[Generator[UUID]] = ZLayer.succeed(UuidGenerator())
+  def int(start: Int = 1): ULayer[Generator[Int]]    = IntGenerator.live(start)
+  val uuid: ULayer[Generator[UUID]]                  = ZLayer.succeed(UuidGenerator())
   val ksuid: URLayer[SecureRandom, Generator[Ksuid]] = ZLayer.fromFunction(ZKsuidGenerator.apply)
-  
+
   def generate[T: Tag]: RIO[Generator[T], T] =
     ZIO.serviceWithZIO[Generator[T]](_.generate)
+
 }

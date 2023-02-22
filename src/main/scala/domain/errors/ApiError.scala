@@ -1,10 +1,20 @@
 package domain.errors
 
-enum ApiError extends RuntimeException {
-  case NotFound extends ApiError
-  case WrongAuthInfo extends ApiError
-  case FailedInsert extends ApiError
-  case MissingCredentials extends ApiError
-  case MissingToken extends ApiError
-  case Unauthorized extends ApiError
+import zio.http.Response
+import zio.http.endpoint.{EndpointMiddleware, RoutesMiddleware}
+import zio.http.model.{HttpError, Status}
+import zio.schema.{DeriveSchema, Schema}
+
+enum ApiError(val status: Status) extends RuntimeException {
+  case NotFound           extends ApiError(Status.NotFound)
+  case WrongAuthInfo      extends ApiError(Status.BadRequest)
+  case FailedInsert       extends ApiError(Status.InternalServerError)
+  case FailedUpdate       extends ApiError(Status.InternalServerError)
+  case MissingCredentials extends ApiError(Status.BadRequest)
+  case MissingToken       extends ApiError(Status.Unauthorized)
+  case Unauthorized       extends ApiError(Status.Unauthorized)
+}
+
+object ApiError {
+  given Schema[ApiError] = DeriveSchema.gen
 }

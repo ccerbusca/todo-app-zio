@@ -1,6 +1,6 @@
 package testinstances
 
-import services.generators.Generator
+import domain.generators.Generator
 import zio.*
 
 case class TestGenerator[T](generator: Generator[T], buffer: Ref[List[T]]) extends Generator[T] {

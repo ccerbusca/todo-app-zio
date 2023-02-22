@@ -1,7 +1,7 @@
 package testinstances
 
 import domain.User
-import services.generators.Generator
+import domain.generators.Generator
 import zio.*
 
 case class UserGenerator(private val intGenerator: Generator[Int]) extends Generator[User] {

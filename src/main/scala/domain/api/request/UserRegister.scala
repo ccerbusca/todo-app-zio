@@ -1,12 +1,13 @@
 package domain.api.request
 
 import zio.json.*
+import zio.schema.{DeriveSchema, Schema}
 
 case class UserRegister(
-  username: String,
-  password: String
-)
+    username: String,
+    password: String,
+) derives JsonCodec
 
 object UserRegister {
-  given decoder: JsonDecoder[UserRegister] = DeriveJsonDecoder.gen[UserRegister]
+  given Schema[UserRegister] = DeriveSchema.gen
 }
