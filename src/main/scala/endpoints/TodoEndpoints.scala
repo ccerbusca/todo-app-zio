@@ -67,24 +67,24 @@ object TodoEndpoints {
       .post("todo")
       .in[AddTodo]
       .out[TodoResponse]
-      .err[ApiError](Status.BadRequest)
+      .outError[ApiError](Status.BadRequest)
 
   private val allTodosForUser =
     Endpoint
       .get("todos")
       .out[List[TodoResponse]]
-      .err[ApiError](Status.Unauthorized)
+      .outError[ApiError](Status.Unauthorized)
 
   private val markCompleted =
     Endpoint
       .post("todo" / "complete" / int("todoId"))
       .out[TodoResponse]
-      .err[ApiError](Status.NotFound)
+      .outError[ApiError](Status.NotFound)
 
   private val getTodoById =
     Endpoint
       .get("todo" / int("todoId"))
       .out[TodoResponse]
-      .err[ApiError](Status.NotFound)
+      .outError[ApiError](Status.NotFound)
 
 }

@@ -13,6 +13,4 @@ case class User(
 
 object User {
   type ID = Int
-  given encoder: JsonEncoder[User] = JsonEncoder[String].contramap(_.username)
-  given schema: Schema[User]       = DeriveSchema.gen
 }

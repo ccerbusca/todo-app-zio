@@ -1,6 +1,5 @@
 package domain
 
-import domain.api.response.{TodoResponse, toResponse}
 import zio.json.*
 import zio.schema.{DeriveSchema, Schema}
 
@@ -16,7 +15,4 @@ case class Todo(
 
 object Todo {
   type ID = Int
-
-  given jsonEncoder: JsonEncoder[Todo] = JsonEncoder[TodoResponse].contramap(_.toResponse)
-  given Schema[Todo]                   = DeriveSchema.gen
 }

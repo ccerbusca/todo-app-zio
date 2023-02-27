@@ -9,7 +9,7 @@ import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
 import zio.http.endpoint.EndpointMiddleware.None
 import zio.http.model.Status
-import zio.{ZIO, ZLayer, http}
+import zio.{ZIO, ZLayer}
 
 case class UserEndpoints(userService: UserService) {
 
@@ -40,12 +40,12 @@ object UserEndpoints {
       .post("register")
       .in[UserRegister]
       .out[UserResponse]
-      .err[ApiError](Status.BadRequest)
+      .outError[ApiError](Status.BadRequest)
 
   private val getUser =
     Endpoint
       .post("user" / int("userId"))
       .out[UserResponse]
-      .err[ApiError](Status.BadRequest)
+      .outError[ApiError](Status.BadRequest)
 
 }
