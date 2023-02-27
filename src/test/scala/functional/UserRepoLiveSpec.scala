@@ -13,32 +13,27 @@ import zio.*
 import zio.test.*
 
 object UserRepoLiveSpec extends ZIOSpecDefault {
+
   override def spec =
     (suite("UserRepoLiveSpec")(
-
       test("User should be correctly added") {
         for {
-          user <- UserGenerator.generate
+          user     <- UserGenerator.generate
           inserted <- UserRepo.add(user)
         } yield assertTrue(user == inserted)
       },
-
       test("User should be correctly fetched by id") {
         for {
           inserted <- UserGenerator.generate.flatMap(UserRepo.add)
-          fetched <- UserRepo.get(inserted.id)
+          fetched  <- UserRepo.get(inserted.id)
         } yield assertTrue(fetched == inserted)
       },
-
       test("User should be correctly fetched by username") {
         for {
           inserted <- UserGenerator.generate.flatMap(UserRepo.add)
-          fetched <- UserRepo.findByUsername(inserted.username)
+          fetched  <- UserRepo.findByUsername(inserted.username)
         } yield assertTrue(fetched == inserted)
-      }
-
-
-
+      },
     ) @@ DbMigrationAspect.migrate()())
       .provide(
         Generator.int(),
@@ -48,4 +43,5 @@ object UserRepoLiveSpec extends ZIOSpecDefault {
         ZPostgreSQLContainer.live,
         Quill.Postgres.fromNamingStrategy(SnakeCase),
       )
+
 }

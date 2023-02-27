@@ -6,7 +6,7 @@ import domain.api.response.TodoResponse
 import domain.errors.ApiError
 import domain.errors.ApiError.Unauthorized
 import domain.generators.Generator
-import domain.{Todo, User}
+import domain.{ Todo, User }
 import io.github.arainko.ducktape.*
 import repos.TodoRepo
 import zio.*

@@ -1,7 +1,7 @@
 package domain
 
 import zio.json.*
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.{ DeriveSchema, Schema }
 
 import java.util.UUID
 

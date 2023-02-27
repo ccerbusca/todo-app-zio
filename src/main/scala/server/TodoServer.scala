@@ -5,12 +5,12 @@ import domain.*
 import domain.api.request.UserRegister
 import domain.errors.ApiError
 import endpoints.*
-import services.{AuthService, TodoService, UserService}
+import services.{ AuthService, TodoService, UserService }
 import zio.*
 import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.Endpoint
-import zio.http.model.{Method, Status}
-import zio.http.{Middleware, Response, Server}
+import zio.http.model.{ Method, Status }
+import zio.http.{ Middleware, Response, Server }
 
 case class TodoServer() {
 

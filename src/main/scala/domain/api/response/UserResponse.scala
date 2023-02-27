@@ -1,7 +1,7 @@
 package domain.api.response
 
 import zio.json.JsonCodec
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.{ DeriveSchema, Schema }
 
 case class UserResponse(
     username: String

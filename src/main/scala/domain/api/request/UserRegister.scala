@@ -1,7 +1,7 @@
 package domain.api.request
 
 import zio.json.*
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.{ DeriveSchema, Schema }
 
 case class UserRegister(
     username: String,

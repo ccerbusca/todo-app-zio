@@ -8,10 +8,10 @@ case class UserGenerator(private val intGenerator: Generator[Int]) extends Gener
 
   def generate(username: String): UIO[User] =
     for {
-      id <- intGenerator.generate
+      id  <- intGenerator.generate
       pwd <- Random.nextString(10)
     } yield User(username, pwd, id)
-    
+
   def generate: UIO[User] =
     Random.nextString(10).flatMap(generate)
 
@@ -24,5 +24,6 @@ object UserGenerator {
     ZIO.serviceWithZIO[UserGenerator](_.generate(username))
 
   def generate: RIO[UserGenerator, User] =
-    ZIO.serviceWithZIO[UserGenerator](_.generate) 
+    ZIO.serviceWithZIO[UserGenerator](_.generate)
+
 }

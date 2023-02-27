@@ -1,6 +1,6 @@
 package domain.generators
 
-import com.github.ksuid.{Ksuid, KsuidGenerator}
+import com.github.ksuid.{ Ksuid, KsuidGenerator }
 import zio.*
 
 import java.security.SecureRandom
