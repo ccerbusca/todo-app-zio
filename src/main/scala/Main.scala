@@ -2,13 +2,13 @@ import auth.*
 import domain.api.request.UserAuthenticate
 import domain.errors.ApiError.MissingCredentials
 import domain.generators.Generator
-import domain.{Todo, User}
+import domain.{ Todo, User }
 import endpoints.*
 import io.getquill.jdbczio.Quill
-import io.getquill.{PostgresZioJdbcContext, SnakeCase}
-import repos.{TodoRepo, UserRepo, db}
+import io.getquill.{ PostgresZioJdbcContext, SnakeCase }
+import repos.{ db, TodoRepo, UserRepo }
 import server.TodoServer
-import services.{AuthService, TodoService, UserService}
+import services.{ AuthService, TodoService, UserService }
 import zio.*
 import zio.concurrent.ConcurrentMap
 import zio.http.*

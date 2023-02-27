@@ -15,7 +15,7 @@ object IntGenerator {
     Ref.make(start).map(IntGenerator.apply)
   }
 
-  def newInt: RIO[Generator[Int], Int]           =
+  def newInt: RIO[Generator[Int], Int] =
     ZIO.serviceWithZIO[Generator[Int]](_.generate)
 
 }
