@@ -2,6 +2,7 @@ package endpoints
 
 import auth.Auth
 import domain.*
+import domain.api.JwtContent
 import domain.api.request.*
 import domain.api.response.TodoResponse
 import domain.errors.ApiError
@@ -14,53 +15,48 @@ import zio.http.model.Status
 
 case class TodoEndpoints(todoService: TodoService) {
 
-  def add =
+  val add =
     TodoEndpoints
       .addTodo
       .implement { addTodo =>
-        Auth.authContext[User].flatMap { user =>
-          todoService.add(addTodo, user)
+        Auth.authContext[JwtContent].flatMap { jwtContent =>
+          todoService.add(addTodo, jwtContent.id)
         }
       }
 
-  def allForUser =
+  val allForUser =
     TodoEndpoints
       .allTodosForUser
       .implement { _ =>
-        Auth.authContext[User].flatMap { user =>
-          todoService.allForUser(user)
+        Auth.authContext[JwtContent].flatMap { jwtContent =>
+          todoService.allForUser(jwtContent.id)
         }
       }
 
-  def markCompleted =
+  val markCompleted =
     TodoEndpoints
       .markCompleted
       .implement { id =>
-        Auth.authContext[User].flatMap { user =>
-          todoService.ownedBy(id, user) *> todoService.markCompleted(id)
+        Auth.authContext[JwtContent].flatMap { jwtContent =>
+          todoService.ownedBy(id, jwtContent.id) *> todoService.markCompleted(id)
         }
       }
 
-  def getTodoById =
+  val getTodoById =
     TodoEndpoints
       .getTodoById
       .implement { id =>
-        Auth.authContext[User].flatMap { user =>
-          todoService.ownedBy(id, user) *> todoService.get(id)
+        Auth.authContext[JwtContent].flatMap { jwtContent =>
+          todoService.ownedBy(id, jwtContent.id) *> todoService.get(id)
         }
       }
 
-  def all = add ++ allForUser ++ markCompleted ++ getTodoById
+  val all = (add ++ allForUser ++ markCompleted ++ getTodoById).toApp
 }
 
 object TodoEndpoints {
 
-  val make: ZIO[TodoService, Nothing, App[Auth[User]]] =
-    for {
-      todoService <- ZIO.service[TodoService]
-      todoEndpoints = TodoEndpoints(todoService)
-      routes        = todoEndpoints.all
-    } yield routes.toApp
+  val make = ZLayer.fromFunction(TodoEndpoints.apply)
 
   private val addTodo =
     Endpoint

@@ -23,17 +23,12 @@ case class UserEndpoints(userService: UserService) {
       .getUser
       .implement(userService.get)
 
-  val all = register ++ getUser
+  val all = (register ++ getUser).toApp
 }
 
 object UserEndpoints {
 
-  val make: ZIO[UserService, Nothing, App[Any]] =
-    for {
-      userService <- ZIO.service[UserService]
-      userEndpoints = UserEndpoints(userService)
-      routes        = userEndpoints.all
-    } yield routes.toApp
+  val make = ZLayer.fromFunction(UserEndpoints.apply)
 
   private val register =
     Endpoint

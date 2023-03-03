@@ -26,7 +26,4 @@ object AuthService {
   val live: ZLayer[UserRepo & PasswordEncoder, Nothing, AuthServiceLive] =
     ZLayer.fromFunction(AuthServiceLive.apply)
 
-  def authenticate(authDTO: UserAuthenticate): ZIO[AuthService, ApiError, User] =
-    ZIO.serviceWithZIO[AuthService](_.authenticate(authDTO))
-
 }

@@ -53,10 +53,4 @@ object UserService {
   val live: URLayer[UserRepo & Generator[Int] & PasswordEncoder, UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
 
-  def add(registerDTO: UserRegister): ZIO[UserService, ApiError, UserResponse] =
-    ZIO.serviceWithZIO[UserService](_.add(registerDTO))
-
-  def get(id: Int): ZIO[UserService, ApiError, UserResponse] =
-    ZIO.serviceWithZIO[UserService](_.get(id))
-
 }

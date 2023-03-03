@@ -1,10 +1,11 @@
 package auth
 
 import domain.User
+import domain.api.JwtContent
 import domain.api.request.UserAuthenticate
 import domain.errors.ApiError
 import domain.errors.ApiError.*
-import services.AuthService
+import services.{AuthService, JwtService}
 import zio.*
 import zio.http.*
 
@@ -37,12 +38,12 @@ object Auth {
 
 }
 
-val authMiddleware: RequestHandlerMiddleware[Auth[User] & AuthService, Response] =
-  Middleware.basicAuthZIO { credentials =>
+val authMiddleware: RequestHandlerMiddleware[Auth[JwtContent] & JwtService, Response] =
+  Middleware.bearerAuthZIO { token =>
     for {
-      user <- AuthService
-        .authenticate(UserAuthenticate.fromCredentials(credentials))
+      jwtContent <- JwtService
+        .decode(token)
         .mapError(apiError => Response.status(apiError.status))
-      _    <- Auth.setContext(Some(user))
+      _    <- Auth.setContext(Some(jwtContent))
     } yield true
   }
