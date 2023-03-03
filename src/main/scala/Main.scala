@@ -22,7 +22,6 @@ object Main extends ZIOAppDefault {
         UserService.live,
         TodoService.live,
         JwtService.live,
-        Generator.int(),
         PasswordEncoder.live,
         db.postgresDefault,
       )

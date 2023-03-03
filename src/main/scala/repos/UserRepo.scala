@@ -14,7 +14,7 @@ trait UserRepo {
 
   def get(id: User.ID): IO[ApiError, User]
 
-  def add(entity: User): IO[ApiError, User]
+  def add(entity: UserRegister): IO[ApiError, User]
 }
 
 case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
@@ -27,11 +27,15 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
       .some
       .orElseFail(ApiError.NotFound)
 
-  override def add(user: User): IO[ApiError, User] =
-    run(quote(query[User].insertValue(lift(user))))
-      .filterOrFail(_ > 0)(ApiError.FailedInsert)
-      .as(user)
-      .refineToOrDie[ApiError]
+  override def add(user: UserRegister): IO[ApiError, User] =
+    run(
+      quote(
+        query[User]
+          .insertValue(lift(User(0, user.username, user.password)))
+          .returning(r => r)
+      )
+    )
+      .orElseFail(ApiError.FailedInsert)
 
   override def findByUsername(username: String): IO[ApiError, User] =
     run(query[User].filter(_.username == lift(username)))
@@ -49,7 +53,7 @@ object UserRepo {
   def get(id: Int): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO(_.get(id))
 
-  def add(entity: User): ZIO[UserRepo, ApiError, User] =
+  def add(entity: UserRegister): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO(_.add(entity))
 
   def findByUsername(username: String): RIO[UserRepo, User] =

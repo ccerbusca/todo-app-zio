@@ -1,8 +1,8 @@
 package repos
 
-import domain.Todo
 import domain.api.request.AddTodo
 import domain.errors.ApiError
+import domain.{Todo, User}
 import io.getquill.*
 import io.getquill.jdbczio.Quill
 import zio.*
@@ -13,11 +13,11 @@ trait TodoRepo {
   def findAllByUserId(userId: Int): IO[ApiError, List[Todo]]
   def markCompleted(id: Int): IO[ApiError, Todo]
 
-  def ownedBy(id: Int, userId: Int): IO[ApiError, Boolean] =
+  def ownedBy(id: Int, userId: User.ID): IO[ApiError, Boolean] =
     get(id).map(_.parentId == userId)
 
   def get(id: Todo.ID): IO[ApiError, Todo]
-  def add(entity: Todo): IO[ApiError, Todo]
+  def add(entity: AddTodo, userId: User.ID): IO[ApiError, Todo]
 }
 
 case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRepo {
@@ -29,11 +29,11 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
       .some
       .orElseFail(ApiError.NotFound)
 
-  override def add(entity: Todo): IO[ApiError, Todo] =
+  override def add(entity: AddTodo, userId: User.ID): IO[ApiError, Todo] =
     run(
       quote(
         query[Todo]
-          .insertValue(lift(entity))
+          .insertValue(lift(Todo(0, userId, entity.title, entity.content)))
           .returning(r => r)
       )
     )
@@ -67,8 +67,8 @@ object TodoRepo {
   def get(id: Int): ZIO[TodoRepo, ApiError, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.get(id))
 
-  def add(todo: Todo): ZIO[TodoRepo, ApiError, Todo] =
-    ZIO.serviceWithZIO[TodoRepo](_.add(todo))
+  def add(todo: AddTodo, userId: User.ID): ZIO[TodoRepo, ApiError, Todo] =
+    ZIO.serviceWithZIO[TodoRepo](_.add(todo, userId))
 
   def markCompleted(id: Int): ZIO[TodoRepo, ApiError, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.markCompleted(id))

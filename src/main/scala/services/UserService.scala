@@ -25,7 +25,6 @@ trait UserService {
 
 case class UserServiceLive(
     userRepo: UserRepo,
-    idGenerator: Generator[Int],
     passwordEncoder: PasswordEncoder,
 ) extends UserService {
 
@@ -36,9 +35,11 @@ case class UserServiceLive(
 
   override def add(registerDTO: UserRegister): IO[ApiError, UserResponse] =
     for {
-      id <- idGenerator.generate
-      newUser = User(registerDTO.username, passwordEncoder.encode(registerDTO.password), id)
-      user <- userRepo.add(newUser)
+      user <- userRepo.add(
+        registerDTO.copy(
+          password = passwordEncoder.encode(registerDTO.password)
+        )
+      )
     } yield user.to[UserResponse]
 
   override def findByUsername(username: String): IO[ApiError, UserResponse] =
@@ -50,7 +51,7 @@ case class UserServiceLive(
 
 object UserService {
 
-  val live: URLayer[UserRepo & Generator[Int] & PasswordEncoder, UserService] =
+  val live: URLayer[UserRepo & PasswordEncoder, UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
 
 }

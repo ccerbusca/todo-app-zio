@@ -6,7 +6,7 @@ import domain.api.response.TodoResponse
 import domain.errors.ApiError
 import domain.errors.ApiError.Unauthorized
 import domain.generators.Generator
-import domain.{ Todo, User }
+import domain.{Todo, User}
 import io.github.arainko.ducktape.*
 import repos.TodoRepo
 import zio.*
@@ -24,7 +24,7 @@ trait TodoService {
   def ownedBy(id: Int, userId: User.ID): IO[ApiError, Boolean]
 }
 
-case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: Generator[Int]) extends TodoService {
+case class TodoServiceLive(todoRepo: TodoRepo) extends TodoService {
 
   override def get(id: Int): IO[ApiError, TodoResponse] =
     todoRepo
@@ -33,9 +33,7 @@ case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: Generator[Int]) exte
 
   override def add(todoDTO: AddTodo, userId: User.ID): IO[ApiError, TodoResponse] =
     for {
-      id <- idGenerator.generate
-      newTodo = Todo(id, userId, todoDTO.title, todoDTO.content)
-      todo <- todoRepo.add(newTodo)
+      todo <- todoRepo.add(todoDTO, userId)
     } yield todo.to[TodoResponse]
 
   override def allForUser(userId: User.ID): IO[ApiError, List[TodoResponse]] =
@@ -57,7 +55,7 @@ case class TodoServiceLive(todoRepo: TodoRepo, idGenerator: Generator[Int]) exte
 
 object TodoService {
 
-  val live: URLayer[TodoRepo & Generator[Int], TodoService] =
+  val live: URLayer[TodoRepo, TodoService] =
     ZLayer.fromFunction(TodoServiceLive.apply)
 
 }

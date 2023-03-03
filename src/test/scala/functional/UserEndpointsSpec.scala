@@ -29,7 +29,7 @@ object UserEndpointsSpec extends ZIOSpecDefault {
             URL.fromString("/register").toOption.get,
           )
           for {
-            endpoints <- UserEndpoints.make
+            endpoints <- ZIO.serviceWith[UserEndpoints](_.all)
             response  <- endpoints.runZIO(request)
             body      <- response.body.asString
           } yield assertTrue(response.status.isSuccess) && assertTrue(
@@ -39,6 +39,7 @@ object UserEndpointsSpec extends ZIOSpecDefault {
       )
     ) @@ DbMigrationAspect.migrate()())
       .provide(
+        UserEndpoints.make,
         PasswordEncoder.live,
         Generator.int(),
         UserService.live,
