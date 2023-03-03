@@ -19,7 +19,8 @@ trait UserRepo {
 
 case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
   import quill.*
-  inline given SchemaMeta[User] = schemaMeta[User]("users")
+  inline given SchemaMeta[User] = schemaMeta("users")
+  inline given InsertMeta[User] = insertMeta(_.id)
 
   override def get(id: Int): IO[ApiError, User] =
     run(query[User].filter(_.id == lift(id)))
@@ -27,14 +28,15 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
       .some
       .orElseFail(ApiError.NotFound)
 
-  override def add(user: UserRegister): IO[ApiError, User] =
+  override def add(userRegister: UserRegister): IO[ApiError, User] =
     run(
       quote(
         query[User]
-          .insertValue(lift(User(0, user.username, user.password)))
+          .insertValue(lift(User(0, userRegister.username, userRegister.password)))
           .returning(r => r)
       )
     )
+      .tapError(Console.printLine(_))
       .orElseFail(ApiError.FailedInsert)
 
   override def findByUsername(username: String): IO[ApiError, User] =
@@ -56,7 +58,7 @@ object UserRepo {
   def add(entity: UserRegister): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO(_.add(entity))
 
-  def findByUsername(username: String): RIO[UserRepo, User] =
+  def findByUsername(username: String): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO[UserRepo](_.findByUsername(username))
 
 }

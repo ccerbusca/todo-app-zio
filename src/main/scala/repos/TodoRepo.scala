@@ -23,6 +23,8 @@ trait TodoRepo {
 case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRepo {
   import quill.*
 
+  inline given InsertMeta[Todo] = insertMeta(_.id)
+
   override def get(id: Int): IO[ApiError, Todo] =
     run(query[Todo].filter(_.id == lift(id)))
       .map(_.headOption)

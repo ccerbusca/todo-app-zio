@@ -1,11 +1,11 @@
 package domain.errors
 
 import zio.http.Response
-import zio.http.endpoint.{ EndpointMiddleware, RoutesMiddleware }
-import zio.http.model.{ HttpError, Status }
-import zio.schema.{ DeriveSchema, Schema }
+import zio.http.endpoint.{EndpointMiddleware, RoutesMiddleware}
+import zio.http.model.{HttpError, Status}
+import zio.schema.{DeriveSchema, Schema}
 
-enum ApiError(val status: Status) extends RuntimeException {
+enum ApiError(val status: Status) {
   case NotFound           extends ApiError(Status.NotFound)
   case WrongAuthInfo      extends ApiError(Status.BadRequest)
   case FailedInsert       extends ApiError(Status.InternalServerError)
