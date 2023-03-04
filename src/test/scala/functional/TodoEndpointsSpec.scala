@@ -42,7 +42,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
           result   <- checkSuccessWithUser(
             user,
             request,
-            _.fromJson[List[TodoResponse]].toOption.get.toSet == todos.map(_.to[TodoResponse]),
+            _.fromJson[Set[TodoResponse]].toOption.get == todos.map(_.to[TodoResponse]),
           )
         } yield result
       },

@@ -48,5 +48,5 @@ val authMiddleware: RequestHandlerMiddleware[Auth[JwtContent] & JwtService, Resp
     } yield true
   }
 
-def secureRoutes[R](http: App[R with Auth[JwtContent]]) =
+def secureRoutes[R](http: App[R & Auth[JwtContent]]) =
   (http @@ authMiddleware).provideSomeLayer(Auth.authLayer[JwtContent])
