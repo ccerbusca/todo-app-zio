@@ -1,6 +1,6 @@
 create table users (
     id int primary key generated always as identity,
-    username varchar(50) not null,
+    username varchar(50) not null unique,
     password varchar(255) not null
 );
 

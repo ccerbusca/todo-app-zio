@@ -1,6 +1,6 @@
 package endpoints
 
-import auth.Auth
+import auth.{Auth, authMiddleware, secureRoutes}
 import domain.*
 import domain.api.JwtContent
 import domain.api.request.*
@@ -51,7 +51,8 @@ case class TodoEndpoints(todoService: TodoService) {
         }
       }
 
-  val all = (add ++ allForUser ++ markCompleted ++ getTodoById).toApp
+  val all = secureRoutes((add ++ allForUser ++ markCompleted ++ getTodoById).toApp)
+
 }
 
 object TodoEndpoints {

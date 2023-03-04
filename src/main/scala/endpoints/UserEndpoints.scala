@@ -9,7 +9,7 @@ import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
 import zio.http.endpoint.EndpointMiddleware.None
 import zio.http.model.Status
-import zio.{ ZIO, ZLayer }
+import zio.{ZIO, ZLayer}
 
 case class UserEndpoints(userService: UserService) {
 
@@ -21,7 +21,7 @@ case class UserEndpoints(userService: UserService) {
   val getUser: Routes[Any, ApiError, None] =
     UserEndpoints
       .getUser
-      .implement(userService.get)
+      .implement(userService.findByUsername)
 
   val all = (register ++ getUser).toApp
 }
@@ -39,7 +39,7 @@ object UserEndpoints {
 
   private val getUser =
     Endpoint
-      .post("user" / int("userId"))
+      .get("user" / string("username"))
       .out[UserResponse]
       .outError[ApiError](Status.BadRequest)
 

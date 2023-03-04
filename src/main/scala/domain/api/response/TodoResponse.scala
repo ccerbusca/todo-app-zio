@@ -1,18 +1,16 @@
 package domain.api.response
 
 import domain.Todo
-import zio.json.{ DeriveJsonEncoder, JsonEncoder }
-import zio.schema.{ DeriveSchema, Schema }
+import zio.json.{DeriveJsonEncoder, JsonCodec, JsonEncoder}
+import zio.schema.{DeriveSchema, Schema}
 
 case class TodoResponse(
     title: String,
     content: String,
     completed: Boolean,
-)
+) derives JsonCodec
 
 object TodoResponse {
-  given JsonEncoder[TodoResponse] = DeriveJsonEncoder.gen
-
   given Schema[TodoResponse] = DeriveSchema.gen
 
   def fromTodo(todo: Todo): TodoResponse =

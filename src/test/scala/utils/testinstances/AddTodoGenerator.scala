@@ -1,4 +1,4 @@
-package testinstances
+package utils.testinstances
 
 import domain.User
 import domain.api.request.AddTodo

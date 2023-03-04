@@ -9,6 +9,7 @@ enum ApiError(val status: Status) {
   case NotFound           extends ApiError(Status.NotFound)
   case WrongAuthInfo      extends ApiError(Status.BadRequest)
   case FailedInsert       extends ApiError(Status.InternalServerError)
+  case FailedDelete       extends ApiError(Status.InternalServerError)
   case FailedUpdate       extends ApiError(Status.InternalServerError)
   case MissingCredentials extends ApiError(Status.BadRequest)
   case MissingToken       extends ApiError(Status.Unauthorized)

@@ -1,5 +1,6 @@
 package repos
 
+import domain.Todo.ID
 import domain.api.request.AddTodo
 import domain.errors.ApiError
 import domain.{Todo, User}
@@ -18,6 +19,8 @@ trait TodoRepo {
 
   def get(id: Todo.ID): IO[ApiError, Todo]
   def add(entity: AddTodo, userId: User.ID): IO[ApiError, Todo]
+
+  def delete(id: Todo.ID): IO[ApiError, Todo]
 }
 
 case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRepo {
@@ -58,6 +61,17 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
       )
     )
       .orElseFail(ApiError.FailedInsert)
+
+  override def delete(id: ID): IO[ApiError, Todo] =
+    run(
+      quote(
+        query[Todo]
+          .filter(_.id == lift(id))
+          .delete
+          .returning(r => r)
+      )
+    )
+      .orElseFail(ApiError.FailedDelete)
 
 }
 

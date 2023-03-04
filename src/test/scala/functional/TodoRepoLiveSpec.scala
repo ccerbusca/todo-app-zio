@@ -7,7 +7,7 @@ import io.getquill.jdbczio.Quill
 import io.github.scottweaver.zio.aspect.DbMigrationAspect
 import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
 import repos.{TodoRepo, UserRepo}
-import testinstances.*
+import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
 import zio.*
 import zio.test.*
 

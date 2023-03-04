@@ -21,27 +21,38 @@ object UserEndpointsSpec extends ZIOSpecDefault {
 
   override def spec =
     (suite("UserEndpointsSpec")(
-      suite("/register")(
-        test("success") {
-          val userRegister = UserRegister("username", "password")
-          val request      = Request.post(
-            Body.fromString(userRegister.toJson),
-            URL.fromString("/register").toOption.get,
-          )
-          for {
-            endpoints <- ZIO.serviceWith[UserEndpoints](_.all)
-            response  <- endpoints.runZIO(request)
-            body      <- response.body.asString
-          } yield assertTrue(response.status.isSuccess) && assertTrue(
-            body == UserResponse("username").toJson
-          )
-        }
-      )
+      test("/register") {
+        val userRegister = UserRegister("username", "password")
+        val request      = Request.post(
+          Body.fromString(userRegister.toJson),
+          URL.fromString("/register").toOption.get,
+        )
+        for {
+          endpoints <- ZIO.serviceWith[UserEndpoints](_.all)
+          response  <- endpoints.runZIO(request)
+          body      <- response.body.asString
+        } yield assertTrue(response.status.isSuccess) && assertTrue(
+          body == UserResponse("username").toJson
+        )
+      },
+      test("user/{username]") {
+        val userRegister = UserRegister("username2", "password2")
+        val request      = Request.get(
+          URL.fromString(s"/user/${userRegister.username}").toOption.get
+        )
+        for {
+          _         <- ZIO.serviceWithZIO[UserService](_.add(userRegister))
+          endpoints <- ZIO.serviceWith[UserEndpoints](_.all)
+          response  <- endpoints.runZIO(request)
+          body      <- response.body.asString
+        } yield assertTrue(response.status.isSuccess) && assertTrue(
+          body == UserResponse("username2").toJson
+        )
+      },
     ) @@ DbMigrationAspect.migrate()())
       .provide(
         UserEndpoints.make,
         PasswordEncoder.live,
-        Generator.int(),
         UserService.live,
         UserRepo.live,
         ZPostgreSQLContainer.Settings.default,

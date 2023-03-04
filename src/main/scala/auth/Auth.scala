@@ -44,6 +44,9 @@ val authMiddleware: RequestHandlerMiddleware[Auth[JwtContent] & JwtService, Resp
       jwtContent <- JwtService
         .decode(token)
         .mapError(apiError => Response.status(apiError.status))
-      _    <- Auth.setContext(Some(jwtContent))
+      _          <- Auth.setContext(Some(jwtContent))
     } yield true
   }
+
+def secureRoutes[R](http: App[R with Auth[JwtContent]]) =
+  (http @@ authMiddleware).provideSomeLayer(Auth.authLayer[JwtContent])

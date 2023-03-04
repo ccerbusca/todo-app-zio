@@ -1,4 +1,4 @@
-package testinstances
+package utils.testinstances
 
 import domain.api.request.UserRegister
 import domain.generators.Generator
@@ -19,10 +19,10 @@ case class UserRegisterGenerator() extends Generator[UserRegister] {
 object UserRegisterGenerator {
   val instance = ZLayer.succeed(UserRegisterGenerator())
 
-  def generate(username: String): RIO[UserRegisterGenerator, UserRegister] =
+  def generate(username: String): URIO[UserRegisterGenerator, UserRegister] =
     ZIO.serviceWithZIO[UserRegisterGenerator](_.generate(username))
 
-  def generate: RIO[UserRegisterGenerator, UserRegister] =
+  def generate: URIO[UserRegisterGenerator, UserRegister] =
     ZIO.serviceWithZIO[UserRegisterGenerator](_.generate)
 
 }
