@@ -31,7 +31,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
         )
         checkSuccess(request, _ == TodoResponse("title", "content", false).toJson)
       },
-      test("/todos") {
+      test("GET /todos") {
         val request = Request.get(
           URL.fromString("/todos").toOption.get
         )
@@ -43,6 +43,35 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
             user,
             request,
             _.fromJson[Set[TodoResponse]].toOption.get == todos.map(_.to[TodoResponse]),
+          )
+        } yield result
+      },
+      test("POST /todo/complete/{todoId}") {
+        for {
+          user    <- LoginUtils.testUser
+          addTodo <- AddTodoGenerator.generate
+          todo    <- ZIO.serviceWithZIO[TodoRepo](_.add(addTodo, user.id))
+          result  <- checkSuccessWithUser(
+            user,
+            Request.post(Body.empty, URL.fromString(s"/todo/complete/${todo.id}").toOption.get),
+            _.fromJson[TodoResponse].toOption.get.completed == true,
+          )
+        } yield result
+      },
+      test("GET /todo/{todoId}") {
+        for {
+          user    <- LoginUtils.testUser
+          addTodo <- AddTodoGenerator.generate
+          todo    <- ZIO.serviceWithZIO[TodoRepo](_.add(addTodo, user.id))
+          result  <- checkSuccessWithUser(
+            user,
+            Request.get(URL.fromString(s"todo/${todo.id}").toOption.get),
+            body => {
+              val todoResponse = body.fromJson[TodoResponse].toOption.get
+              todoResponse.title == addTodo.title &&
+              todoResponse.content == addTodo.content &&
+              !todoResponse.completed
+            },
           )
         } yield result
       },
