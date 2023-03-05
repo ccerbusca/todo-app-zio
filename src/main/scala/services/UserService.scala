@@ -29,7 +29,7 @@ case class UserServiceLive(
   override def add(registerDTO: UserRegister): IO[ApiError, UserResponse] =
     for {
       _    <- exists(registerDTO.username)
-        .filterOrFail(identity)(ApiError.UsernameTaken)
+        .filterOrFail(!_)(ApiError.UsernameTaken)
       user <- userRepo
         .add(
           registerDTO.copy(
@@ -42,7 +42,7 @@ case class UserServiceLive(
     userRepo
       .findByUsername(username)
       .either
-      .map(_.left.exists(_ eq ApiError.NotFound))
+      .map(_.isRight)
 
 }
 
