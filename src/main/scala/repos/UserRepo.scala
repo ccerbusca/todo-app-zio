@@ -14,7 +14,7 @@ trait UserRepo {
 
   def get(id: User.ID): IO[ApiError, User]
 
-  def add(entity: UserRegister): IO[ApiError, User]
+  def add(entity: UserRegister): Task[User]
 }
 
 case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
@@ -28,7 +28,7 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
       .some
       .orElseFail(ApiError.NotFound)
 
-  override def add(userRegister: UserRegister): IO[ApiError, User] =
+  override def add(userRegister: UserRegister): Task[User] =
     run(
       quote(
         query[User]
@@ -36,8 +36,6 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
           .returning(r => r)
       )
     )
-      .tapError(Console.printLine(_))
-      .orElseFail(ApiError.FailedInsert)
 
   override def findByUsername(username: String): IO[ApiError, User] =
     run(query[User].filter(_.username == lift(username)))
@@ -55,7 +53,7 @@ object UserRepo {
   def get(id: Int): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO(_.get(id))
 
-  def add(entity: UserRegister): ZIO[UserRepo, ApiError, User] =
+  def add(entity: UserRegister): RIO[UserRepo, User] =
     ZIO.serviceWithZIO(_.add(entity))
 
   def findByUsername(username: String): ZIO[UserRepo, ApiError, User] =

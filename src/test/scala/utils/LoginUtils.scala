@@ -5,20 +5,20 @@ import domain.errors.ApiError
 import repos.UserRepo
 import services.{JwtService, UserService}
 import utils.testinstances.UserRegisterGenerator
-import zio.ZIO
+import zio.*
 
 object LoginUtils {
 
-  def testUser: ZIO[UserRegisterGenerator & UserRepo, ApiError, User] = for {
+  def testUser: RIO[UserRegisterGenerator & UserRepo, User] = for {
     userGenerate <- UserRegisterGenerator.generate
     user         <- ZIO.serviceWithZIO[UserRepo](_.add(userGenerate))
   } yield user
 
-  def testToken: ZIO[UserRegisterGenerator & JwtService & UserRepo, ApiError, String] = for {
+  def testToken: RIO[UserRegisterGenerator & JwtService & UserRepo, String] = for {
     user  <- testUser
     token <- testToken(user)
   } yield token
-  
+
   def testToken(user: User) = ZIO.serviceWithZIO[JwtService](_.encode(user))
 
 }

@@ -3,6 +3,7 @@ package functional
 import auth.PasswordEncoder
 import domain.api.request.UserRegister
 import domain.api.response.UserResponse
+import domain.errors.ApiError
 import domain.generators.Generator
 import endpoints.UserEndpoints
 import io.getquill.SnakeCase
@@ -21,7 +22,7 @@ object UserEndpointsSpec extends ZIOSpecDefault {
 
   override def spec =
     (suite("UserEndpointsSpec")(
-      test("/register") {
+      test("POST /register") {
         val userRegister = UserRegister("username", "password")
         val request      = Request.post(
           Body.fromString(userRegister.toJson),
@@ -35,18 +36,19 @@ object UserEndpointsSpec extends ZIOSpecDefault {
           body == UserResponse("username").toJson
         )
       },
-      test("user/{username]") {
-        val userRegister = UserRegister("username2", "password2")
-        val request      = Request.get(
-          URL.fromString(s"/user/${userRegister.username}").toOption.get
+      test("POST /register - Username already taken") {
+        val userRegister = UserRegister("username", "password")
+        val request      = Request.post(
+          Body.fromString(userRegister.toJson),
+          URL.fromString("/register").toOption.get,
         )
         for {
-          _         <- ZIO.serviceWithZIO[UserService](_.add(userRegister))
+          _         <- ZIO.serviceWithZIO[UserRepo](_.add(userRegister))
           endpoints <- ZIO.serviceWith[UserEndpoints](_.all)
           response  <- endpoints.runZIO(request)
           body      <- response.body.asString
         } yield assertTrue(response.status.isSuccess) && assertTrue(
-          body == UserResponse("username2").toJson
+          body == ApiError.UsernameTaken.toJson
         )
       },
     ) @@ DbMigrationAspect.migrate()())

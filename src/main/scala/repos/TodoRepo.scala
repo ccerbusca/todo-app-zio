@@ -11,16 +11,16 @@ import zio.*
 import java.util.UUID
 
 trait TodoRepo {
-  def findAllByUserId(userId: Int): IO[ApiError, List[Todo]]
-  def markCompleted(id: Int): IO[ApiError, Todo]
+  def findAllByUserId(userId: Int): Task[List[Todo]]
+  def markCompleted(id: Int): Task[Todo]
 
   def ownedBy(id: Int, userId: User.ID): IO[ApiError, Boolean] =
     get(id).map(_.parentId == userId)
 
   def get(id: Todo.ID): IO[ApiError, Todo]
-  def add(entity: AddTodo, userId: User.ID): IO[ApiError, Todo]
+  def add(entity: AddTodo, userId: User.ID): Task[Todo]
 
-  def delete(id: Todo.ID): IO[ApiError, Todo]
+  def delete(id: Todo.ID): Task[Todo]
 }
 
 case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRepo {
@@ -34,7 +34,7 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
       .some
       .orElseFail(ApiError.NotFound)
 
-  override def add(entity: AddTodo, userId: User.ID): IO[ApiError, Todo] =
+  override def add(entity: AddTodo, userId: User.ID): Task[Todo] =
     run(
       quote(
         query[Todo]
@@ -42,16 +42,14 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
           .returning(r => r)
       )
     )
-      .orElseFail(ApiError.FailedInsert)
 
-  override def findAllByUserId(userId: Int): IO[ApiError, List[Todo]] =
+  override def findAllByUserId(userId: Int): Task[List[Todo]] =
     run(
       query[Todo]
         .filter(_.parentId == lift(userId))
     )
-      .orElseFail(ApiError.NotFound)
 
-  override def markCompleted(id: Int): IO[ApiError, Todo] =
+  override def markCompleted(id: Int): Task[Todo] =
     run(
       quote(
         query[Todo]
@@ -60,9 +58,8 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
           .returning(r => r)
       )
     )
-      .orElseFail(ApiError.FailedInsert)
 
-  override def delete(id: ID): IO[ApiError, Todo] =
+  override def delete(id: ID): Task[Todo] =
     run(
       quote(
         query[Todo]
@@ -71,7 +68,6 @@ case class TodoRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends TodoRe
           .returning(r => r)
       )
     )
-      .orElseFail(ApiError.FailedDelete)
 
 }
 
@@ -83,13 +79,13 @@ object TodoRepo {
   def get(id: Int): ZIO[TodoRepo, ApiError, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.get(id))
 
-  def add(todo: AddTodo, userId: User.ID): ZIO[TodoRepo, ApiError, Todo] =
+  def add(todo: AddTodo, userId: User.ID): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.add(todo, userId))
 
-  def markCompleted(id: Int): ZIO[TodoRepo, ApiError, Todo] =
+  def markCompleted(id: Int): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.markCompleted(id))
 
-  def findAllByUserId(userId: Int): ZIO[TodoRepo, ApiError, List[Todo]] =
+  def findAllByUserId(userId: Int): RIO[TodoRepo, List[Todo]] =
     ZIO.serviceWithZIO[TodoRepo](_.findAllByUserId(userId))
 
   def ownedBy(id: Int, userId: Int): ZIO[TodoRepo, ApiError, Boolean] =

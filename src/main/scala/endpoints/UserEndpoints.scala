@@ -18,12 +18,7 @@ case class UserEndpoints(userService: UserService) {
       .register
       .implement(userService.add)
 
-  val getUser: Routes[Any, ApiError, None] =
-    UserEndpoints
-      .getUser
-      .implement(userService.findByUsername)
-
-  val all = (register ++ getUser).toApp
+  val all = register.toApp
 }
 
 object UserEndpoints {
@@ -34,12 +29,6 @@ object UserEndpoints {
     Endpoint
       .post("register")
       .in[UserRegister]
-      .out[UserResponse]
-      .outError[ApiError](Status.BadRequest)
-
-  private val getUser =
-    Endpoint
-      .get("user" / string("username"))
       .out[UserResponse]
       .outError[ApiError](Status.BadRequest)
 

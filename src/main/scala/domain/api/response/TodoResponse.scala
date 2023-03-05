@@ -13,15 +13,4 @@ case class TodoResponse(
 object TodoResponse {
   given Schema[TodoResponse] = DeriveSchema.gen
 
-  def fromTodo(todo: Todo): TodoResponse =
-    TodoResponse(
-      title = todo.title,
-      content = todo.content,
-      completed = todo.completed,
-    )
-
-}
-
-extension (todo: Todo) {
-  def toResponse: TodoResponse = TodoResponse.fromTodo(todo)
 }

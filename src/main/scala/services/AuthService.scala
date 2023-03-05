@@ -17,6 +17,7 @@ case class AuthServiceLive(userRepo: UserRepo, passwordEncoder: PasswordEncoder)
   override def authenticate(authDTO: UserAuthenticate): ZIO[Any, ApiError, User] =
     userRepo
       .findByUsername(authDTO.username)
+      .mapError(_ => ApiError.WrongAuthInfo)
       .filterOrFail(user => passwordEncoder.verify(authDTO.password, user.password))(WrongAuthInfo)
 
 }

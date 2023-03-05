@@ -18,9 +18,7 @@ import zio.schema.Schema
 import java.util.UUID
 
 trait UserService {
-  def get(id: Int): IO[ApiError, UserResponse]
   def add(registerDTO: UserRegister): IO[ApiError, UserResponse]
-  def findByUsername(username: String): IO[ApiError, UserResponse]
 }
 
 case class UserServiceLive(
@@ -28,24 +26,23 @@ case class UserServiceLive(
     passwordEncoder: PasswordEncoder,
 ) extends UserService {
 
-  override def get(id: Int): IO[ApiError, UserResponse] =
-    userRepo
-      .get(id)
-      .map(_.to[UserResponse])
-
   override def add(registerDTO: UserRegister): IO[ApiError, UserResponse] =
     for {
-      user <- userRepo.add(
-        registerDTO.copy(
-          password = passwordEncoder.encode(registerDTO.password)
-        )
-      )
+      _    <- exists(registerDTO.username)
+        .filterOrFail(identity)(ApiError.UsernameTaken)
+      user <- userRepo
+        .add(
+          registerDTO.copy(
+            password = passwordEncoder.encode(registerDTO.password)
+          )
+        ).orDie
     } yield user.to[UserResponse]
 
-  override def findByUsername(username: String): IO[ApiError, UserResponse] =
+  private def exists(username: String) =
     userRepo
       .findByUsername(username)
-      .map(_.to[UserResponse])
+      .either
+      .map(_.left.exists(_ eq ApiError.NotFound))
 
 }
 
