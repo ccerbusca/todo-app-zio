@@ -1,0 +1,15 @@
+object V {
+  val zio               = "2.0.9+7-3a52faec-SNAPSHOT"
+  val zioHttp           = "0.0.4+29-eb3bab9d-SNAPSHOT"
+  val zioJson           = "0.4.2"
+  val zioSchema         = "0.4.8"
+  val quill             = "4.6.0.1"
+  val ducktape          = "0.1.3"
+  val jwtScala          = "9.2.0"
+  val zioTestcontainers = "0.10.0"
+  val ksuid             = "1.1.2"
+  val postgres          = "42.5.4"
+  val password4j        = "1.7.0"
+  val zioGrpc           = "0.6.0-test2+2-f602caa1-SNAPSHOT"
+  val grpcNetty         = "1.53.0"
+}
