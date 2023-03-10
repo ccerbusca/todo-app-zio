@@ -2,48 +2,46 @@ package services
 
 import io.github.arainko.ducktape.*
 import io.grpc.Status
-import repos.TodoRepo
+import repos.{ db, TodoRepo }
 import scalapb.UnknownFieldSet
 import todos.todo.*
 import todos.todo.ZioTodo.TodoService
 import zio.*
 import zio.stream.*
 
-extension (t: entities.Todo) {
-
-  def toResponse =
-    t.into[Todo]
-      .transform(Field.const(_.unknownFields, UnknownFieldSet.empty))
-
-}
-
 case class TodoServiceGrpc(todoRepo: TodoRepo) extends TodoService {
+  import TodoServiceGrpc.*
 
   override def addTodo(request: AddTodoRequest): IO[Status, Todo] =
-    todoRepo
-      .add(request.entity.get, request.userId)
-      .map(_.toResponse)
-      .mapError(_ => Status.ALREADY_EXISTS)
+    for {
+      entity   <- ZIO
+        .from(request.entity)
+        .mapError(_ => Status.INVALID_ARGUMENT)
+      response <- todoRepo
+        .add(entity, request.userId)
+        .map(_.toResponse)
+        .mapError(_ => Status.INTERNAL)
+    } yield response
 
-  override def getTodo(request: GetTodoRequest): IO[Status, Todo] =
+  override def getTodo(request: Id): IO[Status, Todo] =
     todoRepo
       .get(request.id)
       .some
       .map(_.toResponse)
       .mapError(_ => Status.NOT_FOUND)
 
-  override def allForUser(request: AllForUserRequest): Stream[Status, Todo] =
+  override def allForUser(request: Id): Stream[Status, Todo] =
     ZStream
       .fromIterableZIO(
         todoRepo
-          .findAllByUserId(request.userId)
+          .findAllByUserId(request.id)
           .mapError(_ => Status.INTERNAL)
       )
       .map(_.toResponse)
 
-  override def markCompleted(request: MarkCompletedRequest): IO[Status, Todo] =
+  override def markCompleted(request: Id): IO[Status, Todo] =
     todoRepo
-      .markCompleted(request.todoId)
+      .markCompleted(request.id)
       .mapError(_ => Status.INTERNAL)
       .map(_.toResponse)
 
@@ -51,10 +49,17 @@ case class TodoServiceGrpc(todoRepo: TodoRepo) extends TodoService {
 
 object TodoServiceGrpc {
 
-  val make: TaskLayer[TodoServiceGrpc] = ZLayer.make[TodoServiceGrpc](
+  val make: RLayer[db.QuillPostgres, TodoServiceGrpc] = ZLayer.makeSome[db.QuillPostgres, TodoServiceGrpc](
     ZLayer.fromFunction(TodoServiceGrpc.apply),
     TodoRepo.live,
-    repos.db.postgresDefault,
   )
+
+  extension (t: entities.Todo) {
+
+    def toResponse =
+      t.into[Todo]
+        .transform(Field.const(_.unknownFields, UnknownFieldSet.empty))
+
+  }
 
 }

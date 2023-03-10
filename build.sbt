@@ -61,6 +61,8 @@ lazy val db = (project in file("services/db"))
       "io.github.arainko"     %% "ducktape"                          % V.ducktape,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
+      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
+      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
       "org.postgresql"         % "postgresql"                        % V.postgres,
       "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
     ),

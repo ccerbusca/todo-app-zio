@@ -12,4 +12,5 @@ object V {
   val password4j        = "1.7.0"
   val zioGrpc           = "0.6.0-test2+2-f602caa1-SNAPSHOT"
   val grpcNetty         = "1.53.0"
+  val zioLogging        = "2.1.10"
 }

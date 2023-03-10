@@ -1,7 +1,7 @@
 package repos
 
-import api.request.UserRegister
 import entities.*
+import users.user.User as GUser
 import io.getquill.*
 import io.getquill.jdbczio.Quill
 import zio.*
@@ -13,10 +13,10 @@ trait UserRepo {
 
   def get(id: User.ID): Task[Option[User]]
 
-  def add(entity: UserRegister): Task[User]
+  def add(entity: GUser): Task[User]
 }
 
-case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRepo {
+case class UserRepoLive(quill: db.QuillPostgres) extends UserRepo {
   import quill.*
   inline given SchemaMeta[User] = schemaMeta("users")
   inline given InsertMeta[User] = insertMeta(_.id)
@@ -25,7 +25,7 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
     run(query[User].filter(_.id == lift(id)))
       .map(_.headOption)
 
-  override def add(userRegister: UserRegister): Task[User] =
+  override def add(userRegister: GUser): Task[User] =
     run(
       quote(
         query[User]
@@ -42,13 +42,13 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
 
 object UserRepo {
 
-  val live: URLayer[Quill[PostgresDialect, SnakeCase], UserRepo] =
+  val live: URLayer[db.QuillPostgres, UserRepo] =
     ZLayer.fromFunction(UserRepoLive.apply)
 
   def get(id: Int): RIO[UserRepo, Option[User]] =
     ZIO.serviceWithZIO(_.get(id))
 
-  def add(entity: UserRegister): RIO[UserRepo, User] =
+  def add(entity: GUser): RIO[UserRepo, User] =
     ZIO.serviceWithZIO(_.add(entity))
 
   def findByUsername(username: String): RIO[UserRepo, Option[User]] =

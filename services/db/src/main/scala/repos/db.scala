@@ -1,7 +1,7 @@
 package repos
 
 import io.getquill.jdbczio.Quill
-import io.getquill.{PostgresDialect, SnakeCase}
+import io.getquill.{ PostgresDialect, SnakeCase }
 import zio.*
 
 import javax.sql.DataSource
