@@ -4,7 +4,7 @@ ThisBuild / organization     := "todo"
 ThisBuild / organizationName := "todo"
 
 val zioVersion     = "2.0.10"
-val zioHttpVersion = "0.0.4+29-eb3bab9d-SNAPSHOT"
+val zioHttpVersion = "0.0.5"
 
 resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
 
