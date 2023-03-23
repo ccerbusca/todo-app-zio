@@ -6,6 +6,8 @@ message Todo {
   string title = 1;
   string content = 2;
   optional int64 id = 3;
+  bool completed = 4;
+  int64 userId = 5;
 }
 
 message AddTodoRequest {

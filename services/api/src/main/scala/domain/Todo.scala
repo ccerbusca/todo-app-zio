@@ -6,13 +6,13 @@ import zio.schema.{DeriveSchema, Schema}
 import java.util.UUID
 
 case class Todo(
-    id: Int,
-    parentId: Int,
+    id: Todo.ID,
+    parentId: User.ID,
     title: String,
     content: String,
     completed: Boolean = false,
 ) extends WithId[Todo.ID]
 
 object Todo {
-  type ID = Int
+  type ID = Long
 }

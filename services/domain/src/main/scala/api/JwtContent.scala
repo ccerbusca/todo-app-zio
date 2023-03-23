@@ -3,6 +3,6 @@ package api
 import zio.json.JsonCodec
 
 case class JwtContent(
-    id: Int,
+    id: Long,
     username: String,
 ) derives JsonCodec

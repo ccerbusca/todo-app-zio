@@ -22,7 +22,7 @@ case class UserRepoLive(quill: Quill[PostgresDialect, SnakeCase]) extends UserRe
   inline given SchemaMeta[User] = schemaMeta("users")
   inline given InsertMeta[User] = insertMeta(_.id)
 
-  override def get(id: Int): IO[ApiError, User] =
+  override def get(id: User.ID): IO[ApiError, User] =
     run(query[User].filter(_.id == lift(id)))
       .map(_.headOption)
       .some

@@ -2,7 +2,7 @@ package services
 
 import io.github.arainko.ducktape.*
 import io.grpc.Status
-import repos.{ db, TodoRepo }
+import repos.{TodoRepo, db}
 import scalapb.UnknownFieldSet
 import todos.todo.*
 import todos.todo.ZioTodo.TodoService
@@ -58,7 +58,10 @@ object TodoServiceGrpc {
 
     def toResponse =
       t.into[Todo]
-        .transform(Field.const(_.unknownFields, UnknownFieldSet.empty))
+        .transform(
+          Field.const(_.unknownFields, UnknownFieldSet.empty),
+          Field.renamed(_.userId, _.parentId),
+        )
 
   }
 

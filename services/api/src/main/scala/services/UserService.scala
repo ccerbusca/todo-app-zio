@@ -6,6 +6,8 @@ import auth.PasswordEncoder
 import domain.errors.ApiError
 import io.github.arainko.ducktape.*
 import repos.UserRepo
+import users.user.ZioUser.UserServiceClient
+import users.user.{Username, User as GUser}
 import zio.*
 import zio.http.*
 import zio.http.endpoint.*
@@ -44,9 +46,31 @@ case class UserServiceLive(
 
 }
 
+case class UserServiceV2(userServiceClient: UserServiceClient, passwordEncoder: PasswordEncoder) extends UserService {
+
+  override def add(registerDTO: UserRegister): IO[ApiError, UserResponse] =
+    for {
+      _    <- exists(registerDTO.username)
+        .filterOrFail(!_)(ApiError.UsernameTaken)
+      user <- userServiceClient
+        .addUser(GUser(registerDTO.username, passwordEncoder.encode(registerDTO.password)))
+        .mapError(_ => ApiError.InternalError)
+    } yield user.to[UserResponse]
+
+  private def exists(username: String) =
+    userServiceClient
+      .getUserByUsername(Username(username))
+      .either
+      .map(_.isRight)
+
+}
+
 object UserService {
 
   val live: URLayer[UserRepo & PasswordEncoder, UserService] =
     ZLayer.fromFunction(UserServiceLive.apply)
+
+  val v2_grpc: URLayer[UserServiceClient & PasswordEncoder, UserService] =
+    ZLayer.fromFunction(UserServiceV2.apply)
 
 }
