@@ -5,7 +5,6 @@ import server.TodoServer
 import services.*
 import zio.*
 import zio.http.*
-import zio.http.service.*
 
 object Main extends ZIOAppDefault {
 

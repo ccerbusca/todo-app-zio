@@ -5,12 +5,12 @@ import api.request.AddTodo
 import api.response.TodoResponse
 import auth.{Auth, authMiddleware, secureRoutes}
 import domain.errors.ApiError
-import services.TodoService
+import services.{JwtService, TodoService}
 import zio.*
-import zio.http.App
 import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
 import zio.http.model.Status
+import zio.http.{int as _, *}
 
 case class TodoEndpoints(todoService: TodoService) {
 
@@ -18,7 +18,7 @@ case class TodoEndpoints(todoService: TodoService) {
     TodoEndpoints
       .addTodo
       .implement { addTodo =>
-        Auth.authContext[JwtContent].flatMap { jwtContent =>
+        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
           todoService.add(addTodo, jwtContent.id)
         }
       }
@@ -27,7 +27,7 @@ case class TodoEndpoints(todoService: TodoService) {
     TodoEndpoints
       .allTodosForUser
       .implement { _ =>
-        Auth.authContext[JwtContent].flatMap { jwtContent =>
+        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
           todoService.allForUser(jwtContent.id)
         }
       }
@@ -36,7 +36,7 @@ case class TodoEndpoints(todoService: TodoService) {
     TodoEndpoints
       .markCompleted
       .implement { id =>
-        Auth.authContext[JwtContent].flatMap { jwtContent =>
+        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
           todoService.ownedBy(id, jwtContent.id) *> todoService.markCompleted(id)
         }
       }
@@ -45,7 +45,7 @@ case class TodoEndpoints(todoService: TodoService) {
     TodoEndpoints
       .getTodoById
       .implement { id =>
-        Auth.authContext[JwtContent].flatMap { jwtContent =>
+        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
           todoService.ownedBy(id, jwtContent.id) *> todoService.get(id)
         }
       }

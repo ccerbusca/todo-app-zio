@@ -7,7 +7,7 @@ import zio.*
 import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.Endpoint
 import zio.http.model.{Method, Status}
-import zio.http.{Middleware, Response, Server}
+import zio.http.{Response, Server}
 
 case class TodoServer(
     userEndpoints: UserEndpoints,
@@ -17,7 +17,7 @@ case class TodoServer(
 
   def start =
     Server.serve(
-      httpApp = (userEndpoints.all ++ todoEndpoints.all ++ authEndpoints.all) @@ Middleware.debug
+      httpApp = userEndpoints.all ++ authEndpoints.all ++ todoEndpoints.all
     )
 
 }

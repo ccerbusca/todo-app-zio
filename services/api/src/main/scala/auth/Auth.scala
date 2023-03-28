@@ -6,6 +6,8 @@ import domain.errors.ApiError
 import services.{AuthService, JwtService}
 import zio.*
 import zio.http.*
+import zio.http.middleware.RequestHandlerMiddlewares
+import zio.http.model.{Header, Status}
 
 trait Auth[A] {
   def authContext: IO[ApiError, A]
@@ -36,15 +38,23 @@ object Auth {
 
 }
 
-val authMiddleware: RequestHandlerMiddleware[Auth[JwtContent] & JwtService, Response] =
-  Middleware.bearerAuthZIO { token =>
-    for {
-      jwtContent <- JwtService
-        .decode(token)
-        .mapError(apiError => Response.status(apiError.status))
-      _          <- Auth.setContext(Some(jwtContent))
-    } yield true
-  }
+def authMiddleware[R0] =
+  RequestHandlerMiddlewares
+    .customAuthProvidingZIO[R0, JwtService, Response, JwtContent](headers =>
+      headers.header(Header.Authorization) match {
+        case Some(Header.Authorization.Bearer(token)) =>
+          JwtService
+            .decode(token)
+            .mapBoth(
+              apiError => Response.status(apiError.status),
+              Some(_),
+            )
+        case Some(_)                                  =>
+          ZIO.fail(Response.status(Status.BadRequest))
+        case None                                     =>
+          ZIO.none
+      }
+    )
 
-def secureRoutes[R](http: App[R & Auth[JwtContent]]) =
-  (http @@ authMiddleware).provideSomeLayer(Auth.authLayer[JwtContent])
+def secureRoutes[R](http: App[R & JwtContent]): App[R & JwtService] =
+  http @@ authMiddleware[R]

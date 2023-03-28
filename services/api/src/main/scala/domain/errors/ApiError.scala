@@ -6,8 +6,6 @@ import zio.http.model.{HttpError, Status}
 import zio.json.JsonCodec
 import zio.schema.{DeriveSchema, Schema}
 
-
-
 enum ApiError(val status: Status) derives JsonCodec {
   case NotFound           extends ApiError(Status.NotFound)
   case UsernameTaken      extends ApiError(Status.BadRequest)
@@ -16,6 +14,7 @@ enum ApiError(val status: Status) derives JsonCodec {
   case MissingToken       extends ApiError(Status.Unauthorized)
   case Unauthorized       extends ApiError(Status.Unauthorized)
   case InternalError      extends ApiError(Status.InternalServerError)
+  case InvalidAuthHeader  extends ApiError(Status.BadRequest)
 }
 
 object ApiError {
