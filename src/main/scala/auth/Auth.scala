@@ -5,7 +5,7 @@ import domain.api.JwtContent
 import domain.api.request.UserAuthenticate
 import domain.errors.ApiError
 import domain.errors.ApiError.*
-import services.{AuthService, JwtService}
+import services.{ AuthService, JwtService }
 import zio.*
 import zio.http.*
 
