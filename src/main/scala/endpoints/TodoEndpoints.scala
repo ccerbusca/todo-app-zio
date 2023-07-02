@@ -1,6 +1,6 @@
 package endpoints
 
-import auth.{Auth, authMiddleware, secureRoutes}
+import auth.{ authMiddleware, secureRoutes, Auth }
 import domain.*
 import domain.api.JwtContent
 import domain.api.request.*
