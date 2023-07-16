@@ -13,7 +13,7 @@ import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
 import repos.*
 import services.*
 import utils.LoginUtils
-import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
+import utils.testinstances.{ AddTodoGenerator, UserRegisterGenerator }
 import zio.*
 import zio.http.*
 import zio.json.*
