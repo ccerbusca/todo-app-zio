@@ -11,7 +11,6 @@ import todos.todo.ZioTodo.TodoServiceClient
 import todos.todo.{AddTodoRequest, Id, Todo as GTodo}
 import zio.*
 import zio.http.*
-import zio.http.model.*
 import zio.json.*
 import zio.stream.ZSink
 

@@ -9,7 +9,6 @@ import services.{JwtService, TodoService}
 import zio.*
 import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
-import zio.http.model.Status
 import zio.http.{int as _, *}
 
 case class TodoEndpoints(todoService: TodoService) {

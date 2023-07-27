@@ -11,7 +11,6 @@ import users.user.{Username, User as GUser}
 import zio.*
 import zio.http.*
 import zio.http.endpoint.*
-import zio.http.model.*
 import zio.json.*
 import zio.schema.Schema
 

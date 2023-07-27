@@ -1,8 +1,6 @@
 package domain.errors
 
-import zio.http.Response
-import zio.http.endpoint.{EndpointMiddleware, RoutesMiddleware}
-import zio.http.model.{HttpError, Status}
+import zio.http.Status
 import zio.json.JsonCodec
 import zio.schema.{DeriveSchema, Schema}
 

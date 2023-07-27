@@ -16,34 +16,31 @@ case class TodoServiceGrpc(todoRepo: TodoRepo) extends TodoService {
     for {
       entity   <- ZIO
         .from(request.entity)
-        .mapError(_ => Status.INVALID_ARGUMENT)
+        .orElseFail(Status.INVALID_ARGUMENT)
       response <- todoRepo
         .add(entity, request.userId)
-        .map(_.toResponse)
-        .mapError(_ => Status.INTERNAL)
+        .mapBoth(_ => Status.INTERNAL, _.toResponse)
     } yield response
 
   override def getTodo(request: Id): IO[Status, Todo] =
     todoRepo
       .get(request.id)
       .some
-      .map(_.toResponse)
-      .mapError(_ => Status.NOT_FOUND)
+      .mapBoth(_ => Status.NOT_FOUND, _.toResponse)
 
   override def allForUser(request: Id): Stream[Status, Todo] =
     ZStream
       .fromIterableZIO(
         todoRepo
           .findAllByUserId(request.id)
-          .mapError(_ => Status.INTERNAL)
+          .orElseFail(Status.INTERNAL)
       )
       .map(_.toResponse)
 
   override def markCompleted(request: Id): IO[Status, Todo] =
     todoRepo
       .markCompleted(request.id)
-      .mapError(_ => Status.INTERNAL)
-      .map(_.toResponse)
+      .mapBoth(_ => Status.INTERNAL, _.toResponse)
 
 }
 
@@ -56,7 +53,7 @@ object TodoServiceGrpc {
 
   extension (t: entities.Todo) {
 
-    def toResponse =
+    def toResponse: Todo =
       t.into[Todo]
         .transform(
           Field.const(_.unknownFields, UnknownFieldSet.empty),

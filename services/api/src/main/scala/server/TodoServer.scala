@@ -1,13 +1,10 @@
 package server
 
-import auth.*
 import endpoints.*
 import services.{AuthService, JwtService, TodoService, UserService}
 import zio.*
+import zio.http.Server
 import zio.http.codec.HttpCodec.*
-import zio.http.endpoint.Endpoint
-import zio.http.model.{Method, Status}
-import zio.http.{Response, Server}
 
 case class TodoServer(
     userEndpoints: UserEndpoints,
@@ -15,7 +12,7 @@ case class TodoServer(
     authEndpoints: AuthEndpoints,
 ) {
 
-  def start =
+  def start: URIO[JwtService & Server, Nothing] =
     Server.serve(
       httpApp = userEndpoints.all ++ authEndpoints.all ++ todoEndpoints.all
     )

@@ -3,8 +3,8 @@ package endpoints
 import api.request.UserAuthenticate
 import domain.errors.ApiError
 import services.{AuthService, JwtService}
+import zio.http.Status
 import zio.http.endpoint.*
-import zio.http.model.Status
 import zio.{URLayer, ZIO, ZLayer}
 
 case class AuthEndpoints(authService: AuthService, jwtService: JwtService) {

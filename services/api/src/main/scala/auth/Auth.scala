@@ -6,8 +6,6 @@ import domain.errors.ApiError
 import services.{AuthService, JwtService}
 import zio.*
 import zio.http.*
-import zio.http.middleware.RequestHandlerMiddlewares
-import zio.http.model.{Header, Status}
 
 trait Auth[A] {
   def authContext: IO[ApiError, A]
