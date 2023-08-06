@@ -3,7 +3,7 @@ package utils
 import domain.User
 import domain.errors.ApiError
 import repos.UserRepo
-import services.{JwtService, UserService}
+import services.{ JwtService, UserService }
 import utils.testinstances.UserRegisterGenerator
 import zio.*
 
