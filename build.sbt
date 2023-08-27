@@ -29,7 +29,7 @@ lazy val root = (project in file("."))
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % "0.10.0"   % Test,
       "com.github.ksuid"       % "ksuid"                             % "1.1.2",
       "org.postgresql"         % "postgresql"                        % "42.6.0",
-      "com.password4j"         % "password4j"                        % "1.7.0",
+      "com.password4j"         % "password4j"                        % "1.7.2",
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
     scalacOptions ++= Seq(
