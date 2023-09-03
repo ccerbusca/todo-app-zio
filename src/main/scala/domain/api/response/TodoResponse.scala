@@ -1,8 +1,8 @@
 package domain.api.response
 
 import domain.Todo
-import zio.json.{DeriveJsonEncoder, JsonCodec, JsonEncoder}
-import zio.schema.{DeriveSchema, Schema}
+import zio.json.{ DeriveJsonEncoder, JsonCodec, JsonEncoder }
+import zio.schema.{ DeriveSchema, Schema }
 
 case class TodoResponse(
     title: String,

@@ -1,13 +1,13 @@
 package functional
 
-import domain.generators.{Generator, IntGenerator}
-import domain.{Todo, User}
+import domain.generators.{ Generator, IntGenerator }
+import domain.{ Todo, User }
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
 import io.github.scottweaver.zio.aspect.DbMigrationAspect
 import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
-import repos.{TodoRepo, UserRepo}
-import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
+import repos.{ TodoRepo, UserRepo }
+import utils.testinstances.{ AddTodoGenerator, UserRegisterGenerator }
 import zio.*
 import zio.test.*
 

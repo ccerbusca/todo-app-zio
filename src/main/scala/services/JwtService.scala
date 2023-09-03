@@ -5,12 +5,12 @@ import domain.api.JwtContent
 import domain.errors.ApiError
 import io.netty.handler.ssl.util.SelfSignedCertificate
 import pdi.jwt.algorithms.JwtAsymmetricAlgorithm
-import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtZIOJson}
+import pdi.jwt.{ JwtAlgorithm, JwtClaim, JwtZIOJson }
 import zio.*
 import zio.json.*
 
 import java.security.spec.ECGenParameterSpec
-import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey}
+import java.security.{ KeyPair, KeyPairGenerator, PrivateKey, PublicKey }
 import java.time.Clock
 
 trait JwtService {
@@ -20,7 +20,7 @@ trait JwtService {
 
 case class JwtServiceLive(
     privateKey: PrivateKey,
-    publicKey: PublicKey
+    publicKey: PublicKey,
 ) extends JwtService {
   given Clock = Clock.systemUTC()
 
@@ -48,18 +48,20 @@ case class JwtServiceLive(
 }
 
 object JwtService {
+
   val live: ULayer[JwtService] = ZLayer.succeed {
     val (privateKey, publicKey) = generateKeys()
     JwtServiceLive(privateKey, publicKey)
   }
-  
+
   def decode(token: String): ZIO[JwtService, ApiError, JwtContent] =
     ZIO.serviceWithZIO[JwtService](_.decode(token))
 
   private def generateKeys(): (PrivateKey, PublicKey) = {
     val keyPairGenerator = KeyPairGenerator.getInstance("EC")
     keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"))
-    val keyPair = keyPairGenerator.generateKeyPair
+    val keyPair          = keyPairGenerator.generateKeyPair
     (keyPair.getPrivate, keyPair.getPublic)
   }
+
 }

@@ -2,12 +2,12 @@ package endpoints
 
 import domain.api.request.UserAuthenticate
 import domain.errors.ApiError
-import services.{AuthService, JwtService}
+import services.{ AuthService, JwtService }
 import zio.http.endpoint.*
 import zio.http.model.Status
-import zio.{URLayer, ZIO, ZLayer}
+import zio.{ URLayer, ZIO, ZLayer }
 
-case class AuthEndpoints (authService: AuthService, jwtService: JwtService) {
+case class AuthEndpoints(authService: AuthService, jwtService: JwtService) {
 
   val login =
     AuthEndpoints
@@ -17,12 +17,12 @@ case class AuthEndpoints (authService: AuthService, jwtService: JwtService) {
           .authenticate(userPayload)
           .flatMap(jwtService.encode)
       }
-  
+
   val all = login.toApp
 }
 
 object AuthEndpoints {
-  
+
   val make: URLayer[AuthService & JwtService, AuthEndpoints] = ZLayer.fromFunction(AuthEndpoints.apply)
 
   private val loginEndpoint =
