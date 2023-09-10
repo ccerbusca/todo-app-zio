@@ -19,7 +19,7 @@ lazy val root = (project in file("."))
       "dev.zio"               %% "zio-test"                          % zioVersion % Test,
       "dev.zio"               %% "zio-test-sbt"                      % zioVersion % Test,
       "dev.zio"               %% "zio-test-magnolia"                 % zioVersion % Test,
-      "dev.zio"               %% "zio-json"                          % "0.5.0",
+      "dev.zio"               %% "zio-json"                          % "0.6.2",
       "dev.zio"               %% "zio-http"                          % zioHttpVersion,
       "dev.zio"               %% "zio-http-testkit"                  % zioHttpVersion,
       "io.getquill"           %% "quill-jdbc-zio"                    % "4.6.0.1",
