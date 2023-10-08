@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
       "dev.zio"               %% "zio-json"                          % "0.5.0",
       "dev.zio"               %% "zio-http"                          % zioHttpVersion,
       "dev.zio"               %% "zio-http-testkit"                  % zioHttpVersion,
-      "io.getquill"           %% "quill-jdbc-zio"                    % "4.6.0.1",
+      "io.getquill"           %% "quill-jdbc-zio"                    % "4.8.0",
       "io.github.arainko"     %% "ducktape"                          % "0.1.3",
       "com.github.jwt-scala"  %% "jwt-zio-json"                      % "9.2.0",
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % "0.10.0"   % Test,
