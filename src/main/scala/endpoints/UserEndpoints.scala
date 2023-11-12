@@ -9,7 +9,7 @@ import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
 import zio.http.endpoint.EndpointMiddleware.None
 import zio.http.model.Status
-import zio.{ZIO, ZLayer}
+import zio.{ ZIO, ZLayer }
 
 case class UserEndpoints(userService: UserService) {
 
