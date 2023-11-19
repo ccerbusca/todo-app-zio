@@ -3,7 +3,7 @@ package repos
 import domain.Todo.ID
 import domain.api.request.AddTodo
 import domain.errors.ApiError
-import domain.{Todo, User}
+import domain.{ Todo, User }
 import io.getquill.*
 import io.getquill.jdbczio.Quill
 import zio.*
