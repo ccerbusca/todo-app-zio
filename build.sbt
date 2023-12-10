@@ -28,7 +28,7 @@ lazy val root = (project in file("."))
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % "0.10.0"   % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % "0.10.0"   % Test,
       "com.github.ksuid"       % "ksuid"                             % "1.1.2",
-      "org.postgresql"         % "postgresql"                        % "42.6.0",
+      "org.postgresql"         % "postgresql"                        % "42.7.1",
       "com.password4j"         % "password4j"                        % "1.7.0",
     ),
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
