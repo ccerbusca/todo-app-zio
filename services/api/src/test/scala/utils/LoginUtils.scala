@@ -1,7 +1,7 @@
 package utils
 
 import repos.UserRepo
-import services.{JwtService, UserService}
+import services.{ JwtService, UserService }
 import utils.testinstances.UserRegisterGenerator
 import zio.*
 

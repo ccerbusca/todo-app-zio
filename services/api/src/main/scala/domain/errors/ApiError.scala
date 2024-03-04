@@ -2,7 +2,7 @@ package domain.errors
 
 import zio.http.Status
 import zio.json.JsonCodec
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.{ DeriveSchema, Schema }
 
 enum ApiError(val status: Status) derives JsonCodec {
   case NotFound           extends ApiError(Status.NotFound)

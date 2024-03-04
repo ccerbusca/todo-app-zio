@@ -5,12 +5,12 @@ import domain.User
 import domain.errors.ApiError
 import io.netty.handler.ssl.util.SelfSignedCertificate
 import pdi.jwt.algorithms.JwtAsymmetricAlgorithm
-import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtZIOJson}
+import pdi.jwt.{ JwtAlgorithm, JwtClaim, JwtZIOJson }
 import zio.*
 import zio.json.*
 
 import java.security.spec.ECGenParameterSpec
-import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey}
+import java.security.{ KeyPair, KeyPairGenerator, PrivateKey, PublicKey }
 import java.time.Clock
 
 trait JwtService {
