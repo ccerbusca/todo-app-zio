@@ -3,7 +3,7 @@ package endpoints
 import api.JwtContent
 import api.request.AddTodo
 import api.response.TodoResponse
-import auth.{ authMiddleware, Auth }
+import auth.Auth
 import domain.errors.ApiError
 import services.{ JwtService, TodoService }
 import zio.*
@@ -58,12 +58,14 @@ case class TodoEndpoints(todoService: TodoService) {
         }
       }
 
-  val all: HttpApp[Auth[JwtContent]] = Routes(
+  private val routes = Routes(
     add,
     allForUser,
     markCompleted,
     getTodoById,
-  ).toHttpApp
+  ) @@ auth.authMiddleware
+
+  val all: HttpApp[JwtService with Auth[JwtContent]] = routes.toHttpApp
 
 }
 

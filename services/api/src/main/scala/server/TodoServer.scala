@@ -14,7 +14,7 @@ case class TodoServer(
     authEndpoints: AuthEndpoints,
 ) {
 
-  def start: URIO[Auth[JwtContent] & Server, Nothing] = {
+  def start: URIO[JwtService & Auth[JwtContent] & Server, Nothing] = {
     val endpoints = userEndpoints.all ++ authEndpoints.all ++ todoEndpoints.all
     Server.serve(
       httpApp = endpoints

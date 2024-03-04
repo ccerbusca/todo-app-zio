@@ -13,6 +13,7 @@ trait Auth[A] {
 }
 
 object Auth {
+
   def authContext[A: Tag]: ZIO[Auth[A], ApiError, A] =
     ZIO.serviceWithZIO[Auth[A]](_.authContext)
 
@@ -26,16 +27,35 @@ object Auth {
         new Auth[A] {
           override def authContext: IO[ApiError, A] = ref.get.flatMap {
             case Some(value) => ZIO.succeed(value)
-            case None => ZIO.fail(ApiError.Unauthorized)
+            case None        => ZIO.fail(ApiError.Unauthorized)
           }
 
           override def setContext(e: Option[A]): UIO[Unit] = ref.set(e)
         }
       }
   }
+
 }
 
-def authMiddleware[R]: HandlerAspect[R & JwtService, JwtContent] =
+def authMiddleware =
+  Middleware.customAuthZIO { req =>
+    req.headers.header(Header.Authorization) match {
+      case Some(Header.Authorization.Bearer(token)) =>
+        JwtService
+          .decode(token)
+          .map(Some(_))
+          .flatMap(Auth.setContext)
+          .mapBoth(
+            err => Response.status(err.status),
+            _ => true,
+          )
+      case _                                        =>
+        ZIO.succeed(false)
+    }
+  }
+
+//doesnt work on Endpoints lol
+def _authMiddleware[R]: HandlerAspect[R & JwtService, JwtContent] =
   Middleware
     .customAuthProvidingZIO[R & JwtService, JwtContent](headers =>
       headers.header(Header.Authorization) match {
