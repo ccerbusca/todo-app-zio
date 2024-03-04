@@ -13,7 +13,7 @@ trait TodoRepo {
   def findAllByUserId(userId: User.ID): Task[List[Todo]]
   def markCompleted(id: Todo.ID): Task[Todo]
 
-  def ownedBy(id: Int, userId: User.ID): IO[ApiError, Boolean] =
+  def ownedBy(id: Todo.ID, userId: User.ID): IO[ApiError, Boolean] =
     get(id).map(_.parentId == userId)
 
   def get(id: Todo.ID): IO[ApiError, Todo]
@@ -75,19 +75,19 @@ object TodoRepo {
   val live: URLayer[Quill[PostgresDialect, SnakeCase], TodoRepo] =
     ZLayer.fromFunction(TodoRepoLive.apply)
 
-  def get(id: Int): ZIO[TodoRepo, ApiError, Todo] =
+  def get(id: Todo.ID): ZIO[TodoRepo, ApiError, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.get(id))
 
   def add(todo: AddTodo, userId: User.ID): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.add(todo, userId))
 
-  def markCompleted(id: Int): RIO[TodoRepo, Todo] =
+  def markCompleted(id: Todo.ID): RIO[TodoRepo, Todo] =
     ZIO.serviceWithZIO[TodoRepo](_.markCompleted(id))
 
-  def findAllByUserId(userId: Int): RIO[TodoRepo, List[Todo]] =
+  def findAllByUserId(userId: User.ID): RIO[TodoRepo, List[Todo]] =
     ZIO.serviceWithZIO[TodoRepo](_.findAllByUserId(userId))
 
-  def ownedBy(id: Int, userId: Int): ZIO[TodoRepo, ApiError, Boolean] =
+  def ownedBy(id: Todo.ID, userId: User.ID): ZIO[TodoRepo, ApiError, Boolean] =
     ZIO.serviceWithZIO[TodoRepo](_.ownedBy(id, userId))
 
 }

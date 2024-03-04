@@ -3,82 +3,92 @@ package endpoints
 import api.JwtContent
 import api.request.AddTodo
 import api.response.TodoResponse
-import auth.{Auth, authMiddleware, secureRoutes}
+import auth.{ authMiddleware, Auth }
 import domain.errors.ApiError
-import services.{JwtService, TodoService}
+import services.{ JwtService, TodoService }
 import zio.*
-import zio.http.codec.HttpCodec.*
 import zio.http.endpoint.*
-import zio.http.{int as _, *}
+import zio.http.*
 
 case class TodoEndpoints(todoService: TodoService) {
 
-  val add =
+  private val add =
     TodoEndpoints
       .addTodo
-      .implement { addTodo =>
-        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
-          todoService.add(addTodo, jwtContent.id)
+      .implement {
+        Handler.fromFunctionZIO { addTodo =>
+          Auth.authContext[JwtContent].flatMap { ctx =>
+            todoService.add(addTodo, ctx.id)
+          }
         }
       }
 
-  val allForUser =
+  private val allForUser =
     TodoEndpoints
       .allTodosForUser
-      .implement { _ =>
-        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
-          todoService.allForUser(jwtContent.id)
+      .implement {
+        Handler.fromZIO {
+          Auth.authContext[JwtContent].flatMap { ctx =>
+            todoService.allForUser(ctx.id)
+          }
         }
       }
 
-  val markCompleted =
+  private val markCompleted =
     TodoEndpoints
       .markCompleted
-      .implement { id =>
-        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
-          todoService.ownedBy(id, jwtContent.id) *> todoService.markCompleted(id)
+      .implement {
+        Handler.fromFunctionZIO { id =>
+          Auth.authContext[JwtContent].flatMap { ctx =>
+            todoService.ownedBy(id, ctx.id) *>
+              todoService.markCompleted(id)
+          }
         }
       }
 
-  val getTodoById =
+  private val getTodoById =
     TodoEndpoints
       .getTodoById
-      .implement { id =>
-        ZIO.serviceWithZIO[JwtContent] { jwtContent =>
-          todoService.ownedBy(id, jwtContent.id) *> todoService.get(id)
+      .implement {
+        Handler.fromFunctionZIO { id =>
+          Auth.authContext[JwtContent].flatMap { ctx =>
+            todoService.ownedBy(id, ctx.id) *>
+              todoService.get(id)
+          }
         }
       }
 
-  val all = secureRoutes((add ++ allForUser ++ markCompleted ++ getTodoById).toApp)
+  val all: HttpApp[Auth[JwtContent]] = Routes(
+    add,
+    allForUser,
+    markCompleted,
+    getTodoById,
+  ).toHttpApp
 
 }
 
 object TodoEndpoints {
 
-  val make = ZLayer.fromFunction(TodoEndpoints.apply)
+  val make: URLayer[TodoService, TodoEndpoints] = ZLayer.fromFunction(TodoEndpoints.apply)
 
   private val addTodo =
-    Endpoint
-      .post("todo")
+    Endpoint(Method.POST / "todo")
       .in[AddTodo]
       .out[TodoResponse]
       .outError[ApiError](Status.BadRequest)
 
   private val allTodosForUser =
-    Endpoint
-      .get("todos")
+    Endpoint(Method.GET / "todos")
       .out[List[TodoResponse]]
       .outError[ApiError](Status.Unauthorized)
 
   private val markCompleted =
-    Endpoint
-      .post("todo" / "complete" / int("todoId"))
+    Endpoint(Method.GET / "todo" / "complete" / int("todoId"))
       .out[TodoResponse]
       .outError[ApiError](Status.NotFound)
 
   private val getTodoById =
-    Endpoint
-      .get("todo" / int("todoId"))
+    Endpoint(Method.GET / "todo" / int("todoId"))
       .out[TodoResponse]
       .outError[ApiError](Status.NotFound)
 

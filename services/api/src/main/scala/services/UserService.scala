@@ -53,7 +53,7 @@ case class UserServiceV2(userServiceClient: UserServiceClient, passwordEncoder: 
         .filterOrFail(!_)(ApiError.UsernameTaken)
       user <- userServiceClient
         .addUser(GUser(registerDTO.username, passwordEncoder.encode(registerDTO.password)))
-        .mapError(_ => ApiError.InternalError)
+        .orElseFail(ApiError.InternalError)
     } yield user.to[UserResponse]
 
   private def exists(username: String) =

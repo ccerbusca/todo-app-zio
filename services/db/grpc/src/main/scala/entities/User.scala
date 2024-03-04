@@ -6,7 +6,7 @@ import zio.schema.*
 import java.util.UUID
 
 case class User(
-    id: Long,
+    id: User.ID,
     username: String,
     password: String,
 ) extends WithId[User.ID]

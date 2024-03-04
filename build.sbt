@@ -17,7 +17,7 @@ lazy val root = (project in file("."))
     name           := "TodoApp",
     publish / skip := true,
   )
-  .aggregate(domain, api, db, protos)
+  .aggregate(domain, api, grpc_db, protos)
 
 lazy val api = (project in file("services/api"))
   .dependsOn(protos, domain)
@@ -46,10 +46,33 @@ lazy val api = (project in file("services/api"))
     testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
   )
 
-lazy val db = (project in file("services/db"))
+//lazy val db_abi = (project in file("services/db/db"))
+//  .dependsOn(domain)
+//  .enablePlugins(JavaAppPackaging, DockerPlugin)
+//  .settings(stdSettings("db-api"))
+//  .settings(flywaySettings)
+//  .settings(
+//    libraryDependencies ++= Seq(
+//      "dev.zio"               %% "zio"                               % V.zio,
+//      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
+//      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
+//      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
+//      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
+//      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
+//      "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
+//      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
+//      "org.postgresql"         % "postgresql"                        % V.postgres,
+//      "io.github.arainko"     %% "ducktape"                          % V.ducktape,
+//      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
+//      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
+//    ),
+//    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
+//  )
+
+lazy val grpc_db = (project in file("services/db/grpc"))
   .dependsOn(protos, domain)
   .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
-  .settings(stdSettings("db"))
+  .settings(stdSettings("db-grpc"))
   .settings(flywaySettings)
   .settings(
     libraryDependencies ++= Seq(

@@ -1,10 +1,5 @@
 package domain
 
-import zio.json.*
-import zio.schema.{DeriveSchema, Schema}
-
-import java.util.UUID
-
 case class Todo(
     id: Todo.ID,
     parentId: User.ID,

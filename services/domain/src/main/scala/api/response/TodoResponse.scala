@@ -1,15 +1,10 @@
 package api.response
 
 import zio.json.{DeriveJsonEncoder, JsonCodec, JsonEncoder}
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.*
 
 case class TodoResponse(
     title: String,
     content: String,
     completed: Boolean,
-) derives JsonCodec
-
-object TodoResponse {
-  given Schema[TodoResponse] = DeriveSchema.gen
-
-}
+) derives JsonCodec, Schema

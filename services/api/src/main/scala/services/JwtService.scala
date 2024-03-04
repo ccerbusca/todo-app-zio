@@ -3,15 +3,12 @@ package services
 import api.JwtContent
 import domain.User
 import domain.errors.ApiError
-import io.netty.handler.ssl.util.SelfSignedCertificate
-import pdi.jwt.algorithms.JwtAsymmetricAlgorithm
 import pdi.jwt.{ JwtAlgorithm, JwtClaim, JwtZIOJson }
 import zio.*
 import zio.json.*
 
 import java.security.spec.ECGenParameterSpec
-import java.security.{ KeyPair, KeyPairGenerator, PrivateKey, PublicKey }
-import java.time.Clock
+import java.security.{ KeyPairGenerator, PrivateKey, PublicKey }
 
 trait JwtService {
   def encode(user: User): UIO[String]
@@ -22,17 +19,16 @@ case class JwtServiceLive(
     privateKey: PrivateKey,
     publicKey: PublicKey,
 ) extends JwtService {
-  given Clock = Clock.systemUTC()
 
-  override def encode(user: User): UIO[String] = {
-    val claim =
-      JwtClaim(
-        JwtContent(user.id, user.username).toJson
-      )
-        .issuedNow
-        .expiresIn(60 * 60 * 24)
-    ZIO.succeed(JwtZIOJson.encode(claim, privateKey, JwtAlgorithm.ES512))
-  }
+  override def encode(user: User): UIO[String] =
+    for {
+      given java.time.Clock <- zio.Clock.javaClock
+      claim =
+        JwtClaim(JwtContent(user.id, user.username).toJson)
+          .issuedNow
+          .expiresIn(60 * 60 * 24)
+
+    } yield JwtZIOJson.encode(claim, privateKey, JwtAlgorithm.ES512)
 
   override def decode(jwtToken: String): IO[ApiError, JwtContent] =
     ZIO
@@ -43,7 +39,7 @@ case class JwtServiceLive(
         )
       )
       .flatMap(claims => ZIO.from(claims.content.fromJson[JwtContent]))
-      .mapError(_ => ApiError.Unauthorized)
+      .orElseFail(ApiError.Unauthorized)
 
 }
 

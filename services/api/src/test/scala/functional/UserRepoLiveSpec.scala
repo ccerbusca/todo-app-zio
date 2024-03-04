@@ -12,7 +12,7 @@ import zio.test.*
 
 object UserRepoLiveSpec extends ZIOSpecDefault {
 
-  override def spec =
+  override def spec: Spec[Any, Any] =
     (suite("UserRepoLiveSpec")(
       test("User should be correctly added and fetched") {
         for {

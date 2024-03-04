@@ -1,8 +1,8 @@
 package services
 
 import io.github.arainko.ducktape.*
-import io.grpc.Status
-import repos.{TodoRepo, db}
+import io.grpc.{ Status, StatusException }
+import repos.{ db, TodoRepo }
 import scalapb.UnknownFieldSet
 import todos.todo.*
 import todos.todo.ZioTodo.TodoService
@@ -12,35 +12,35 @@ import zio.stream.*
 case class TodoServiceGrpc(todoRepo: TodoRepo) extends TodoService {
   import TodoServiceGrpc.*
 
-  override def addTodo(request: AddTodoRequest): IO[Status, Todo] =
+  override def addTodo(request: AddTodoRequest): IO[StatusException, Todo] =
     for {
       entity   <- ZIO
         .from(request.entity)
-        .orElseFail(Status.INVALID_ARGUMENT)
+        .orElseFail(StatusException(Status.INVALID_ARGUMENT))
       response <- todoRepo
         .add(entity, request.userId)
-        .mapBoth(_ => Status.INTERNAL, _.toResponse)
+        .mapBoth(_ => StatusException(Status.INTERNAL), _.toResponse)
     } yield response
 
-  override def getTodo(request: Id): IO[Status, Todo] =
+  override def getTodo(request: Id): IO[StatusException, Todo] =
     todoRepo
       .get(request.id)
       .some
-      .mapBoth(_ => Status.NOT_FOUND, _.toResponse)
+      .mapBoth(_ => StatusException(Status.NOT_FOUND), _.toResponse)
 
-  override def allForUser(request: Id): Stream[Status, Todo] =
+  override def allForUser(request: Id): Stream[StatusException, Todo] =
     ZStream
       .fromIterableZIO(
         todoRepo
           .findAllByUserId(request.id)
-          .orElseFail(Status.INTERNAL)
+          .orElseFail(StatusException(Status.INTERNAL))
       )
       .map(_.toResponse)
 
-  override def markCompleted(request: Id): IO[Status, Todo] =
+  override def markCompleted(request: Id): IO[StatusException, Todo] =
     todoRepo
       .markCompleted(request.id)
-      .mapBoth(_ => Status.INTERNAL, _.toResponse)
+      .mapBoth(_ => StatusException(Status.INTERNAL), _.toResponse)
 
 }
 

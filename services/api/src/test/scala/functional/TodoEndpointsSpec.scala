@@ -2,7 +2,9 @@ package functional
 
 import api.JwtContent
 import api.request.AddTodo
+import api.response.TodoResponse
 import auth.Auth
+import domain.User
 import endpoints.TodoEndpoints
 import io.getquill.jdbczio.Quill
 import io.github.arainko.ducktape.*
@@ -14,24 +16,25 @@ import utils.LoginUtils
 import utils.testinstances.{ AddTodoGenerator, UserRegisterGenerator }
 import zio.*
 import zio.http.*
+import zio.http.Header.Authorization
 import zio.json.*
 import zio.test.*
 
 object TodoEndpointsSpec extends ZIOSpecDefault {
 
-  override def spec =
+  override def spec: Spec[Any, Any] =
     (suite("TodoEndpointsSpec")(
       test("POST /todo") {
         val addTodo = AddTodo("title", "content")
         val request = Request.post(
-          Body.fromString(addTodo.toJson),
-          URL.fromString("/todo").toOption.get,
+          body = Body.fromString(addTodo.toJson),
+          url = url"/todo",
         )
         checkSuccess(request, _ == TodoResponse("title", "content", false).toJson)
       },
       test("GET /todos") {
         val request = Request.get(
-          URL.fromString("/todos").toOption.get
+          url"/todos"
         )
         for {
           user     <- LoginUtils.testUser
@@ -51,7 +54,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
           todo    <- ZIO.serviceWithZIO[TodoRepo](_.add(addTodo, user.id))
           result  <- checkSuccessWithUser(
             user,
-            Request.post(Body.empty, URL.fromString(s"/todo/complete/${todo.id}").toOption.get),
+            Request.post(body = Body.empty, url = url"/todo/complete/${todo.id}"),
             _.fromJson[TodoResponse].toOption.get.completed == true,
           )
         } yield result
@@ -63,7 +66,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
           todo    <- ZIO.serviceWithZIO[TodoRepo](_.add(addTodo, user.id))
           result  <- checkSuccessWithUser(
             user,
-            Request.get(URL.fromString(s"todo/${todo.id}").toOption.get),
+            Request.get(url"todo/${todo.id}"),
             body => {
               val todoResponse = body.fromJson[TodoResponse].toOption.get
               todoResponse.title == addTodo.title &&
@@ -75,6 +78,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
       },
     ) @@ DbMigrationAspect.migrate()())
       .provide(
+        Auth[JwtContent],
         TodoEndpoints.make,
         TodoService.live,
         JwtService.live,
@@ -87,7 +91,7 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
         Quill.Postgres.fromNamingStrategy(io.getquill.SnakeCase),
       )
 
-  def checkSuccessWithUser(
+  private def checkSuccessWithUser(
       user: User,
       request: Request,
       expectedBodyPredicate: String => Boolean,
@@ -95,11 +99,11 @@ object TodoEndpointsSpec extends ZIOSpecDefault {
     for {
       token     <- LoginUtils.testToken(user)
       endpoints <- ZIO.serviceWith[TodoEndpoints](_.all)
-      response  <- endpoints.runZIO(request.withAuthorization(s"Bearer $token"))
+      response  <- endpoints.runZIO(request.addHeader(Authorization.Bearer(token)))
       body      <- response.body.asString
-    } yield assertTrue(response.status.isSuccess) && assertTrue(expectedBodyPredicate(body))
+    } yield assertTrue(response.status.isSuccess, expectedBodyPredicate(body))
 
-  def checkSuccess(request: Request, expectedBodyPredicate: String => Boolean) =
+  private def checkSuccess(request: Request, expectedBodyPredicate: String => Boolean) =
     for {
       user   <- LoginUtils.testUser
       result <- checkSuccessWithUser(user, request, expectedBodyPredicate)

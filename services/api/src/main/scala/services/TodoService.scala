@@ -63,8 +63,10 @@ case class TodoServiceV2(todoServiceClient: TodoServiceClient) extends TodoServi
   override def get(id: Todo.ID): IO[ApiError, TodoResponse] =
     todoServiceClient
       .getTodo(Id(id))
-      .mapError(_ => ApiError.NotFound)
-      .map(_.to[TodoResponse])
+      .mapBoth(
+        _ => ApiError.NotFound,
+        _.to[TodoResponse]
+      )
 
   override def add(todoDTO: AddTodo, userId: User.ID): IO[ApiError, TodoResponse] =
     todoServiceClient
@@ -73,29 +75,36 @@ case class TodoServiceV2(todoServiceClient: TodoServiceClient) extends TodoServi
           entity = Some(GTodo(todoDTO.title, todoDTO.content, id = None)),
           userId = userId,
         )
+      ).mapBoth(
+        _ => ApiError.InternalError,
+        _.to[TodoResponse]
       )
-      .mapError(_ => ApiError.InternalError)
-      .map(_.to[TodoResponse])
 
   override def allForUser(userId: User.ID): IO[ApiError, List[TodoResponse]] =
     todoServiceClient
       .allForUser(Id(userId))
       .map(_.to[TodoResponse])
       .runCollect
-      .map(_.toList)
-      .mapError(_ => ApiError.InternalError)
+      .mapBoth(
+        _ => ApiError.InternalError,
+        _.toList
+      )
 
   override def markCompleted(id: Todo.ID): IO[ApiError, TodoResponse] =
     todoServiceClient
       .markCompleted(Id(id))
-      .map(_.to[TodoResponse])
-      .mapError(_ => ApiError.InternalError)
+      .mapBoth(
+        _ => ApiError.InternalError,
+        _.to[TodoResponse]
+      )
 
   override def ownedBy(id: Todo.ID, userId: User.ID): IO[ApiError, Boolean] =
     todoServiceClient
       .getTodo(Id(id))
-      .mapError(_ => ApiError.InternalError)
-      .map(_.userId == userId)
+      .mapBoth(
+        _ => ApiError.InternalError,
+        _.userId == userId
+      )
 
 }
 

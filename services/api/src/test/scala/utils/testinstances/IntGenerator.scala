@@ -1,4 +1,4 @@
-package domain.generators
+package utils.testinstances
 
 import zio.*
 

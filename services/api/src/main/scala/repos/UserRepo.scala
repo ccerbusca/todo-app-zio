@@ -50,7 +50,7 @@ object UserRepo {
   val live: URLayer[Quill[PostgresDialect, SnakeCase], UserRepo] =
     ZLayer.fromFunction(UserRepoLive.apply)
 
-  def get(id: Int): ZIO[UserRepo, ApiError, User] =
+  def get(id: User.ID): ZIO[UserRepo, ApiError, User] =
     ZIO.serviceWithZIO(_.get(id))
 
   def add(entity: UserRegister): RIO[UserRepo, User] =

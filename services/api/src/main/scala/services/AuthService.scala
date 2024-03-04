@@ -19,7 +19,7 @@ case class AuthServiceLive(userRepo: UserRepo, passwordEncoder: PasswordEncoder)
   override def authenticate(authDTO: UserAuthenticate): ZIO[Any, ApiError, User] =
     userRepo
       .findByUsername(authDTO.username)
-      .mapError(_ => ApiError.WrongAuthInfo)
+      .orElseFail(ApiError.WrongAuthInfo)
       .filterOrFail(user => passwordEncoder.verify(authDTO.password, user.password))(ApiError.WrongAuthInfo)
 
 }
@@ -31,7 +31,7 @@ case class AuthServiceV2(userServiceClient: UserServiceClient, passwordEncoder: 
       .getUserByUsername(Username(authDTO.username))
       .map(_.toDomain)
       .some
-      .mapError(_ => ApiError.Unauthorized)
+      .orElseFail(ApiError.Unauthorized)
       .filterOrFail(user => passwordEncoder.verify(authDTO.password, user.password))(ApiError.WrongAuthInfo)
 
 }

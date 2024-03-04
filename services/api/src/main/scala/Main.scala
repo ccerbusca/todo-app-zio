@@ -1,4 +1,5 @@
-import auth.PasswordEncoder
+import api.JwtContent
+import auth.{ Auth, PasswordEncoder }
 import repos.*
 import server.TodoServer
 import services.*
@@ -21,6 +22,7 @@ object Main extends ZIOAppDefault {
         JwtService.live,
         PasswordEncoder.live,
         db.postgresDefault,
+        Auth[JwtContent],
       )
 
 }

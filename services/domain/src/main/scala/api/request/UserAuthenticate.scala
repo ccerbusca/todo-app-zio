@@ -1,13 +1,8 @@
 package api.request
 
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.*
 
 case class UserAuthenticate(
     username: String,
     password: String,
-)
-
-object UserAuthenticate {
-
-  given Schema[UserAuthenticate] = DeriveSchema.gen
-}
+) derives Schema

@@ -1,6 +1,6 @@
 package services
 
-import io.grpc.Status
+import io.grpc.{ Status, StatusException }
 import repos.{ db, UserRepo }
 import users.user.{ User, Username }
 import users.user.ZioUser.UserService
@@ -11,18 +11,16 @@ import scalapb.UnknownFieldSet
 case class UserServiceGrpc(userRepo: UserRepo) extends UserService {
   import UserServiceGrpc.*
 
-  override def addUser(request: User): IO[Status, User] =
+  override def addUser(request: User): IO[StatusException, User] =
     userRepo
       .add(request)
-      .mapError(_ => Status.INTERNAL)
-      .map(_.toResponse)
+      .mapBoth(_ => StatusException(Status.INTERNAL), _.toResponse)
 
-  override def getUserByUsername(request: Username): IO[Status, User] =
+  override def getUserByUsername(request: Username): IO[StatusException, User] =
     userRepo
       .findByUsername(request.username)
       .some
-      .map(_.toResponse)
-      .mapError(_ => Status.NOT_FOUND)
+      .mapBoth(_ => StatusException(Status.NOT_FOUND), _.toResponse)
 
 }
 
@@ -35,7 +33,7 @@ object UserServiceGrpc {
 
   extension (u: entities.User) {
 
-    def toResponse =
+    def toResponse: User =
       u.into[User]
         .transform(Field.const(_.unknownFields, UnknownFieldSet.empty))
 

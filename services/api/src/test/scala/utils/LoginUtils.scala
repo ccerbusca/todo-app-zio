@@ -1,5 +1,6 @@
 package utils
 
+import domain.User
 import repos.UserRepo
 import services.{ JwtService, UserService }
 import utils.testinstances.UserRegisterGenerator

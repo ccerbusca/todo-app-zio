@@ -2,9 +2,9 @@ package domain.errors
 
 import zio.http.Status
 import zio.json.JsonCodec
-import zio.schema.{ DeriveSchema, Schema }
+import zio.schema.*
 
-enum ApiError(val status: Status) derives JsonCodec {
+enum ApiError(val status: Status) derives JsonCodec, Schema {
   case NotFound           extends ApiError(Status.NotFound)
   case UsernameTaken      extends ApiError(Status.BadRequest)
   case MissingCredentials extends ApiError(Status.Unauthorized)
@@ -13,8 +13,4 @@ enum ApiError(val status: Status) derives JsonCodec {
   case Unauthorized       extends ApiError(Status.Unauthorized)
   case InternalError      extends ApiError(Status.InternalServerError)
   case InvalidAuthHeader  extends ApiError(Status.BadRequest)
-}
-
-object ApiError {
-  given Schema[ApiError] = DeriveSchema.gen
 }

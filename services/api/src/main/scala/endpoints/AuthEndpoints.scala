@@ -2,23 +2,28 @@ package endpoints
 
 import api.request.UserAuthenticate
 import domain.errors.ApiError
-import services.{AuthService, JwtService}
-import zio.http.Status
+import services.{ AuthService, JwtService }
+import zio.http.*
 import zio.http.endpoint.*
-import zio.{URLayer, ZIO, ZLayer}
+import zio.*
 
 case class AuthEndpoints(authService: AuthService, jwtService: JwtService) {
 
-  val login =
+  private val login =
     AuthEndpoints
       .loginEndpoint
-      .implement { userPayload =>
-        authService
-          .authenticate(userPayload)
-          .flatMap(jwtService.encode)
+      .implement {
+        Handler.fromFunctionZIO[UserAuthenticate] { userPayload =>
+          authService
+            .authenticate(userPayload)
+            .flatMap(jwtService.encode)
+        }
       }
 
-  val all = login.toApp
+  val all: HttpApp[Any] = Routes(
+    login
+  ).toHttpApp
+
 }
 
 object AuthEndpoints {
@@ -26,8 +31,7 @@ object AuthEndpoints {
   val make: URLayer[AuthService & JwtService, AuthEndpoints] = ZLayer.fromFunction(AuthEndpoints.apply)
 
   private val loginEndpoint =
-    Endpoint
-      .post("login")
+    Endpoint(Method.POST / "login")
       .in[UserAuthenticate]
       .out[String]
       .outError[ApiError](Status.Unauthorized)

@@ -1,5 +1,6 @@
 package utils.testinstances
 
+import api.request.UserRegister
 import zio.*
 
 case class UserRegisterGenerator() extends Generator[UserRegister] {
@@ -15,7 +16,7 @@ case class UserRegisterGenerator() extends Generator[UserRegister] {
 }
 
 object UserRegisterGenerator {
-  val instance = ZLayer.succeed(UserRegisterGenerator())
+  val instance: ULayer[UserRegisterGenerator] = ZLayer.succeed(UserRegisterGenerator())
 
   def generate(username: String): URIO[UserRegisterGenerator, UserRegister] =
     ZIO.serviceWithZIO[UserRegisterGenerator](_.generate(username))

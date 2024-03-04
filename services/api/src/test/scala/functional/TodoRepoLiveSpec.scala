@@ -11,7 +11,7 @@ import zio.test.*
 
 object TodoRepoLiveSpec extends ZIOSpecDefault {
 
-  override def spec =
+  override def spec: Spec[Any, Any] =
     (suite("TodoRepoLiveSpec")(
       test("Todo should be correctly inserted and fetched") {
         for {

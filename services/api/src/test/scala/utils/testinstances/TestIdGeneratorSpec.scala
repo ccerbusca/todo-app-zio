@@ -29,9 +29,7 @@ object TestIdGeneratorSpec extends ZIOSpecDefault {
         } yield assertTrue(ksuid != newKsuid)
       },
     ).provide(
-      // Preserve this order to prevent circular dependency error (TestIdGenerator.test[Ksuid] needs IdGenerator.ksuid, while itself being a Ksuid generator)
-      Generator.ksuid,
-      TestGenerator.test[Ksuid],
+      Generator.ksuid >>> TestGenerator.test[Ksuid],
       ZLayer.succeed(new SecureRandom()),
     )
 

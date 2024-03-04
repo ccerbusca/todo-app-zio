@@ -1,7 +1,9 @@
 package server
 
+import api.JwtContent
 import endpoints.*
-import services.{AuthService, JwtService, TodoService, UserService}
+import auth.*
+import services.{ AuthService, JwtService, TodoService, UserService }
 import zio.*
 import zio.http.Server
 import zio.http.codec.HttpCodec.*
@@ -12,21 +14,24 @@ case class TodoServer(
     authEndpoints: AuthEndpoints,
 ) {
 
-  def start: URIO[JwtService & Server, Nothing] =
+  def start: URIO[Auth[JwtContent] & Server, Nothing] = {
+    val endpoints = userEndpoints.all ++ authEndpoints.all ++ todoEndpoints.all
     Server.serve(
-      httpApp = userEndpoints.all ++ authEndpoints.all ++ todoEndpoints.all
+      httpApp = endpoints
     )
+  }
 
 }
 
 object TodoServer {
   private type TodoServerEnv = UserService & TodoService & AuthService & JwtService
 
-  val live = ZLayer.makeSome[TodoServerEnv, TodoServer](
-    ZLayer.fromFunction(TodoServer.apply),
-    UserEndpoints.make,
-    TodoEndpoints.make,
-    AuthEndpoints.make,
-  )
+  val live: ZLayer[TodoServerEnv, Nothing, TodoServer] =
+    ZLayer.makeSome[TodoServerEnv, TodoServer](
+      ZLayer.fromFunction(TodoServer.apply),
+      UserEndpoints.make,
+      TodoEndpoints.make,
+      AuthEndpoints.make,
+    )
 
 }

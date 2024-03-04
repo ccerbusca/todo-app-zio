@@ -1,12 +1,8 @@
 package api.response
 
 import zio.json.JsonCodec
-import zio.schema.{DeriveSchema, Schema}
+import zio.schema.*
 
 case class UserResponse(
     username: String
-) derives JsonCodec
-
-object UserResponse {
-  given Schema[UserResponse] = DeriveSchema.gen
-}
+) derives JsonCodec, Schema

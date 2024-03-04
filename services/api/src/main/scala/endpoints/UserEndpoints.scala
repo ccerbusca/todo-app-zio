@@ -4,29 +4,29 @@ import api.request.UserRegister
 import api.response.UserResponse
 import domain.errors.ApiError
 import services.UserService
-import zio.http.{App, Status}
-import zio.http.codec.HttpCodec.*
+import zio.http.*
 import zio.http.endpoint.*
-import zio.http.endpoint.EndpointMiddleware.None
-import zio.{ZIO, ZLayer}
+import zio.*
 
 case class UserEndpoints(userService: UserService) {
 
-  val register: Routes[Any, ApiError, None] =
+  private val register =
     UserEndpoints
       .register
-      .implement(userService.add)
+      .implement(Handler.fromFunctionZIO(userService.add))
 
-  val all = register.toApp
+  val all: HttpApp[Any] = Routes(
+    register
+  ).toHttpApp
+
 }
 
 object UserEndpoints {
 
-  val make = ZLayer.fromFunction(UserEndpoints.apply)
+  val make: URLayer[UserService, UserEndpoints] = ZLayer.fromFunction(UserEndpoints.apply)
 
   private val register =
-    Endpoint
-      .post("register")
+    Endpoint(Method.POST / "register")
       .in[UserRegister]
       .out[UserResponse]
       .outError[ApiError](Status.BadRequest)
