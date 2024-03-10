@@ -27,10 +27,12 @@ object Auth {
       .make[Option[A]](None)
       .map { ref =>
         new Auth[A] {
+
           override def authContext: IO[ApiError, A]        = ref.get.flatMap {
             case Some(value) => ZIO.succeed(value)
             case None        => ZIO.fail(Unauthorized)
           }
+
           override def setContext(e: Option[A]): UIO[Unit] = ref.set(e)
         }
       }
