@@ -1,9 +1,8 @@
 package auth
 
 import api.JwtContent
-import api.request.UserAuthenticate
 import domain.errors.ApiError
-import services.{ AuthService, JwtService }
+import services.JwtService
 import zio.*
 import zio.http.*
 
@@ -37,7 +36,7 @@ object Auth {
 
 }
 
-def authMiddleware =
+def authMiddleware: HandlerAspect[Auth[JwtContent] & JwtService, Unit] =
   Middleware.customAuthZIO { req =>
     req.headers.header(Header.Authorization) match {
       case Some(Header.Authorization.Bearer(token)) =>

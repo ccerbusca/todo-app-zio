@@ -9,7 +9,7 @@ object V {
   val zioTestcontainers = "0.10.0"
   val ksuid             = "1.1.2"
   val postgres          = "42.7.1"
-  val password4j        = "1.8.0"
+  val password4j = "1.8.1"
   val grpcNetty         = "1.60.1"
   val zioLogging        = "2.1.14"
 }

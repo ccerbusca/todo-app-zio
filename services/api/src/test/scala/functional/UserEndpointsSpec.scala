@@ -7,20 +7,17 @@ import domain.errors.ApiError
 import endpoints.UserEndpoints
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
-import io.github.scottweaver.zio.aspect.DbMigrationAspect
-import io.github.scottweaver.zio.testcontainers.postgres.ZPostgreSQLContainer
 import repos.*
 import services.*
 import zio.*
 import zio.http.*
-import zio.http.endpoint.EndpointExecutor
 import zio.json.*
 import zio.test.*
 
-object UserEndpointsSpec extends ZIOSpecDefault {
+object UserEndpointsSpec extends BaseFunctionalTest {
 
-  override def spec: Spec[Any, Any] =
-    (suite("UserEndpointsSpec")(
+  override def tests: Spec[db.QuillPostgres, Any] =
+    suite("UserEndpointsSpec")(
       test("POST /register") {
         val userRegister = UserRegister("username", "password")
         val request      = Request.post(
@@ -46,15 +43,12 @@ object UserEndpointsSpec extends ZIOSpecDefault {
           body      <- response.body.asString
         } yield assertTrue(response.status.isSuccess, body == ApiError.UsernameTaken.toJson)
       },
-    ) @@ DbMigrationAspect.migrate()())
-      .provide(
+    )
+      .provideSome[db.QuillPostgres](
         UserEndpoints.make,
         PasswordEncoder.live,
         UserService.live,
         UserRepo.live,
-        ZPostgreSQLContainer.Settings.default,
-        ZPostgreSQLContainer.live,
-        Quill.Postgres.fromNamingStrategy(io.getquill.SnakeCase),
       )
 
 }

@@ -2,7 +2,7 @@ package utils
 
 import domain.User
 import repos.UserRepo
-import services.{ JwtService, UserService }
+import services.JwtService
 import utils.testinstances.UserRegisterGenerator
 import zio.*
 
@@ -18,6 +18,7 @@ object LoginUtils {
     token <- testToken(user)
   } yield token
 
-  def testToken(user: User) = ZIO.serviceWithZIO[JwtService](_.encode(user))
+  def testToken(user: User): ZIO[JwtService, Nothing, String] =
+    ZIO.serviceWithZIO[JwtService](_.encode(user))
 
 }
