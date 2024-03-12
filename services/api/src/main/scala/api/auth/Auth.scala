@@ -41,7 +41,7 @@ def authMiddleware: HandlerAspect[Auth[JwtContent] & JwtService, Unit] =
     req.headers.header(Header.Authorization) match {
       case Some(Header.Authorization.Bearer(token)) =>
         JwtService
-          .decode(token)
+          .decode(token.value.asString)
           .map(Some(_))
           .flatMap(Auth.setContext)
           .mapBoth(
@@ -60,7 +60,7 @@ def _authMiddleware[R]: HandlerAspect[R & JwtService, JwtContent] =
       headers.header(Header.Authorization) match {
         case Some(Header.Authorization.Bearer(token)) =>
           JwtService
-            .decode(token)
+            .decode(token.value.asString)
             .either
             .map(_.toOption)
         case _                                        =>
