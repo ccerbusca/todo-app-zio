@@ -1,14 +1,14 @@
 package functional
 
+import api.auth.PasswordEncoder
+import api.endpoints.UserEndpoints
+import api.errors.ApiError
 import api.request.UserRegister
 import api.response.UserResponse
-import auth.PasswordEncoder
-import domain.errors.ApiError
-import endpoints.UserEndpoints
+import api.services.*
+import db.repos.UserRepo
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
-import repos.*
-import services.*
 import zio.*
 import zio.http.*
 import zio.json.*

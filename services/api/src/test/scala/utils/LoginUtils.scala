@@ -1,8 +1,8 @@
 package utils
 
-import domain.User
-import repos.UserRepo
-import services.JwtService
+import api.services.JwtService
+import db.entities.User
+import db.repos.UserRepo
 import utils.testinstances.UserRegisterGenerator
 import zio.*
 

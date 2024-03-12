@@ -1,8 +1,8 @@
 package functional
 
+import db.repos.*
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
-import repos.{TodoRepo, UserRepo, db}
 import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
 import zio.*
 import zio.test.*

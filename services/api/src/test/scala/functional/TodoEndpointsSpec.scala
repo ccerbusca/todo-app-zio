@@ -1,17 +1,16 @@
 package functional
 
 import api.JwtContent
+import api.auth.Auth
+import api.endpoints.TodoEndpoints
 import api.request.AddTodo
 import api.response.TodoResponse
-import auth.Auth
-import domain.User
-import endpoints.TodoEndpoints
+import api.services.*
+import db.entities.User
+import db.repos.{TodoRepo, UserRepo}
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
 import io.github.arainko.ducktape.*
-import repos.*
-import repos.db.QuillPostgres
-import services.*
 import utils.LoginUtils
 import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
 import zio.*
@@ -22,7 +21,7 @@ import zio.test.*
 
 object TodoEndpointsSpec extends BaseFunctionalTest {
 
-  override def tests: Spec[QuillPostgres, Any] =
+  override def tests: Spec[db.QuillPostgres, Any] =
     suite("TodoEndpointsSpec")(
       test("POST /todo") {
         val addTodo = AddTodo("title", "content")
@@ -77,7 +76,7 @@ object TodoEndpointsSpec extends BaseFunctionalTest {
         } yield result
       },
     )
-      .provideSome[QuillPostgres](
+      .provideSome[db.QuillPostgres](
         Auth[JwtContent],
         TodoEndpoints.make,
         TodoService.live,

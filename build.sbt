@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
   .aggregate(domain, api, grpc_db, protos)
 
 lazy val api = (project in file("services/api"))
-  .dependsOn(protos, domain)
+  .dependsOn(protos, domain, grpc_db, simple_db)
   .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
   .settings(stdSettings("api"))
   .settings(flywaySettings)
@@ -43,34 +43,30 @@ lazy val api = (project in file("services/api"))
       "com.password4j"         % "password4j"                        % V.password4j,
       "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
     ),
-    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
   )
 
-//lazy val db_abi = (project in file("services/db/db"))
-//  .dependsOn(domain)
-//  .enablePlugins(JavaAppPackaging, DockerPlugin)
-//  .settings(stdSettings("db-api"))
-//  .settings(flywaySettings)
-//  .settings(
-//    libraryDependencies ++= Seq(
-//      "dev.zio"               %% "zio"                               % V.zio,
-//      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
-//      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
-//      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
-//      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
-//      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
-//      "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
-//      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
-//      "org.postgresql"         % "postgresql"                        % V.postgres,
-//      "io.github.arainko"     %% "ducktape"                          % V.ducktape,
-//      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
-//      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
-//    ),
-//    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
-//  )
+lazy val simple_db = (project in file("services/db/simple"))
+  .dependsOn(domain)
+  .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
+  .settings(stdSettings("db-simple"))
+  .settings(flywaySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % V.zio,
+      "dev.zio" %% "zio-test" % V.zio % Test,
+      "dev.zio" %% "zio-test-sbt" % V.zio % Test,
+      "dev.zio" %% "zio-test-magnolia" % V.zio % Test,
+      "dev.zio" %% "zio-logging" % V.zioLogging,
+      "dev.zio" %% "zio-logging-slf4j" % V.zioLogging,
+      "io.getquill" %% "quill-jdbc-zio" % V.quill,
+      "org.postgresql" % "postgresql" % V.postgres,
+      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % V.zioTestcontainers % Test,
+    ),
+  )
 
 lazy val grpc_db = (project in file("services/db/grpc"))
-  .dependsOn(protos, domain)
+  .dependsOn(protos, domain, simple_db)
   .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
   .settings(stdSettings("db-grpc"))
   .settings(flywaySettings)
@@ -89,7 +85,6 @@ lazy val grpc_db = (project in file("services/db/grpc"))
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
     ),
-    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
   )
 
 lazy val protos = (project in file("services/protos"))
