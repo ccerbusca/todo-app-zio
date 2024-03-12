@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package todos;
+
+message Todo {
+  string title = 1;
+  string content = 2;
+  optional int64 id = 3;
+  bool completed = 4;
+  int64 userId = 5;
+}
+
+message AddTodoRequest {
+  Todo entity = 1;
+  int64 userId = 2;
+}
+
+message Id {
+  int64 id = 1;
+}
+
+service TodoService {
+  rpc AddTodo(AddTodoRequest) returns (Todo);
+  rpc GetTodo(Id) returns (Todo);
+  rpc AllForUser(Id) returns (stream Todo);
+  rpc MarkCompleted(Id) returns (Todo);
+}

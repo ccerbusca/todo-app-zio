@@ -1,59 +1,120 @@
 ThisBuild / scalaVersion     := "3.3.3"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "todo"
 ThisBuild / organizationName := "todo"
+ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
 
-val zioVersion     = "2.0.21"
-val zioHttpVersion = "0.0.4+29-eb3bab9d-SNAPSHOT"
-
-resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
+def stdSettings(moduleName: String) = Seq(
+  name        := moduleName,
+  version     := "0.1.0",
+  Test / fork := true,
+  scalacOptions ++= Seq(
+    "-no-indent"
+  ),
+)
 
 lazy val root = (project in file("."))
   .settings(
-    name    := "ZIOTest",
-    version := "0.1.0",
+    name           := "TodoApp",
+    publish / skip := true,
+  )
+  .aggregate(domain, api, grpc_db, protos)
+
+lazy val api = (project in file("services/api"))
+  .dependsOn(protos, domain, grpc_db, simple_db)
+  .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
+  .settings(stdSettings("api"))
+  .settings(flywaySettings)
+  .settings(
     libraryDependencies ++= Seq(
-      "dev.zio"               %% "zio"                               % zioVersion,
-      "dev.zio"               %% "zio-streams"                       % zioVersion,
-      "dev.zio"               %% "zio-concurrent"                    % zioVersion,
-      "dev.zio"               %% "zio-test"                          % zioVersion % Test,
-      "dev.zio"               %% "zio-test-sbt"                      % zioVersion % Test,
-      "dev.zio"               %% "zio-test-magnolia"                 % zioVersion % Test,
-      "dev.zio"               %% "zio-json"                          % "0.6.2",
-      "dev.zio"               %% "zio-http"                          % zioHttpVersion,
-      "dev.zio"               %% "zio-http-testkit"                  % zioHttpVersion,
-      "io.getquill"           %% "quill-jdbc-zio"                    % "4.8.1",
-      "io.github.arainko"     %% "ducktape"                          % "0.1.3",
-      "com.github.jwt-scala"  %% "jwt-zio-json"                      % "9.4.6",
-      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % "0.10.0"   % Test,
-      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % "0.10.0"   % Test,
-      "com.github.ksuid"       % "ksuid"                             % "1.1.2",
-      "org.postgresql"         % "postgresql"                        % "42.6.1",
-      "com.password4j"         % "password4j"                        % "1.7.0",
-    ),
-    testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework"),
-    scalacOptions ++= Seq(
-      "-no-indent"
+      "dev.zio"               %% "zio"                               % V.zio,
+      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
+      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
+      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
+      "dev.zio"               %% "zio-json"                          % V.zioJson,
+      "dev.zio"               %% "zio-http"                          % V.zioHttp,
+      "dev.zio"               %% "zio-http-testkit"                  % V.zioHttp,
+      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
+      "io.github.arainko"     %% "ducktape"                          % V.ducktape,
+      "com.github.jwt-scala"  %% "jwt-zio-json"                      % V.jwtScala,
+      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
+      "com.github.ksuid"       % "ksuid"                             % V.ksuid,
+      "org.postgresql"         % "postgresql"                        % V.postgres,
+      "com.password4j"         % "password4j"                        % V.password4j,
+      "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
     ),
   )
 
-Test / fork := true
+lazy val simple_db = (project in file("services/db/simple"))
+  .dependsOn(domain)
+  .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
+  .settings(stdSettings("db-simple"))
+  .settings(flywaySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio" % V.zio,
+      "dev.zio" %% "zio-test" % V.zio % Test,
+      "dev.zio" %% "zio-test-sbt" % V.zio % Test,
+      "dev.zio" %% "zio-test-magnolia" % V.zio % Test,
+      "dev.zio" %% "zio-logging" % V.zioLogging,
+      "dev.zio" %% "zio-logging-slf4j" % V.zioLogging,
+      "io.getquill" %% "quill-jdbc-zio" % V.quill,
+      "org.postgresql" % "postgresql" % V.postgres,
+      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % V.zioTestcontainers % Test,
+    ),
+  )
 
-//Flyway configuration
-enablePlugins(FlywayPlugin)
+lazy val grpc_db = (project in file("services/db/grpc"))
+  .dependsOn(protos, domain, simple_db)
+  .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
+  .settings(stdSettings("db-grpc"))
+  .settings(flywaySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.zio"               %% "zio"                               % V.zio,
+      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
+      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
+      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
+      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
+      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
+      "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
+      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
+      "org.postgresql"         % "postgresql"                        % V.postgres,
+      "io.github.arainko"     %% "ducktape"                          % V.ducktape,
+      "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
+    ),
+  )
 
-flywayLocations += "db/migration"
+lazy val protos = (project in file("services/protos"))
+  .settings(
+    Compile / PB.targets      := Seq(
+      scalapb.gen(grpc = true)          -> (Compile / sourceManaged).value,
+      scalapb.zio_grpc.ZioCodeGenerator -> (Compile / sourceManaged).value,
+    ),
+    Compile / PB.protoSources := Seq(
+      (ThisBuild / baseDirectory).value / "services" / "protos" / "src" / "main" / "protobuf"
+    ),
+    libraryDependencies ++= Seq(
+      "com.thesamet.scalapb" %% "scalapb-runtime-grpc" % scalapb.compiler.Version.scalapbVersion
+    ),
+  )
 
-flywayUrl      := "jdbc:postgresql://localhost:15432/test"
-flywayUser     := "postgres"
-flywayPassword := "admin"
+lazy val domain = (project in file("services/domain"))
+  .settings(stdSettings("domain"))
+  .settings(
+    libraryDependencies ++= Seq(
+      "dev.zio"     %% "zio-json"              % V.zioJson,
+      "dev.zio"     %% "zio-schema"            % V.zioSchema,
+      "dev.zio"     %% "zio-schema-derivation" % V.zioSchema,
+      "io.getquill" %% "quill-jdbc-zio"        % V.quill,
+    )
+  )
 
-Test / flywayUrl      := "jdbc:postgresql://localhost/test"
-Test / flywayUser     := "postgres"
-Test / flywayPassword := "admin"
-
-//Dockerization
-enablePlugins(JavaAppPackaging)
-enablePlugins(DockerPlugin)
-
-Docker / maintainer := "ccerbusca"
+def flywaySettings = Seq(
+  flywayLocations += "db/migration",
+  flywayUrl      := "jdbc:postgresql://localhost:15432/test",
+  flywayUser     := "postgres",
+  flywayPassword := "admin",
+)
