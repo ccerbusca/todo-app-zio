@@ -1,6 +1,6 @@
 object V {
   val zio               = "2.0.21"
-  val zioHttp = "3.0.0-RC5"
+  val zioHttp           = "3.0.0-RC5"
   val zioJson           = "0.6.2"
   val zioSchema         = "1.0.1"
   val quill             = "4.8.1"
@@ -8,8 +8,8 @@ object V {
   val jwtScala          = "10.0.0"
   val zioTestcontainers = "0.10.0"
   val ksuid             = "1.1.2"
-  val postgres = "42.7.2"
-  val password4j = "1.8.1"
+  val postgres          = "42.7.3"
+  val password4j        = "1.8.1"
   val grpcNetty         = "1.60.1"
-  val zioLogging = "2.2.0"
+  val zioLogging        = "2.2.0"
 }
