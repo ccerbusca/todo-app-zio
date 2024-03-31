@@ -42,7 +42,7 @@ lazy val api = (project in file("services/api"))
       "org.postgresql"         % "postgresql"                        % V.postgres,
       "com.password4j"         % "password4j"                        % V.password4j,
       "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
-    ),
+    )
   )
 
 lazy val simple_db = (project in file("services/db/simple"))
@@ -52,17 +52,17 @@ lazy val simple_db = (project in file("services/db/simple"))
   .settings(flywaySettings)
   .settings(
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % V.zio,
-      "dev.zio" %% "zio-test" % V.zio % Test,
-      "dev.zio" %% "zio-test-sbt" % V.zio % Test,
-      "dev.zio" %% "zio-test-magnolia" % V.zio % Test,
-      "dev.zio" %% "zio-logging" % V.zioLogging,
-      "dev.zio" %% "zio-logging-slf4j" % V.zioLogging,
-      "io.getquill" %% "quill-jdbc-zio" % V.quill,
-      "org.postgresql" % "postgresql" % V.postgres,
+      "dev.zio"               %% "zio"                               % V.zio,
+      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
+      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
+      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
+      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
+      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
+      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
+      "org.postgresql"         % "postgresql"                        % V.postgres,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
-      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % V.zioTestcontainers % Test,
-    ),
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
+    )
   )
 
 lazy val grpc_db = (project in file("services/db/grpc"))
@@ -84,7 +84,7 @@ lazy val grpc_db = (project in file("services/db/grpc"))
       "io.github.arainko"     %% "ducktape"                          % V.ducktape,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
-    ),
+    )
   )
 
 lazy val protos = (project in file("services/protos"))

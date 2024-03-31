@@ -1,8 +1,8 @@
 package db
 
 import io.getquill.jdbczio.Quill
-import io.getquill.{PostgresDialect, SnakeCase}
-import zio.{TaskLayer, URLayer}
+import io.getquill.{ PostgresDialect, SnakeCase }
+import zio.{ TaskLayer, URLayer }
 
 import javax.sql.DataSource
 

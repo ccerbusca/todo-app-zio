@@ -11,6 +11,7 @@ import users.user.Username
 import users.user.ZioUser.UserServiceClient
 import users.user.ZioUser.UserServiceClient.*
 import zio.*
+
 trait AuthService {
   def authenticate(user: UserAuthenticate): ZIO[Any, ApiError, User]
 }
@@ -41,7 +42,7 @@ object AuthService {
 
   val live: ZLayer[UserRepo & PasswordEncoder, Nothing, AuthServiceLive] =
     ZLayer.fromFunction(AuthServiceLive.apply)
-    
+
   val v2_grpc: ZLayer[UserServiceClient & PasswordEncoder, Nothing, AuthService] =
     ZLayer.fromFunction(AuthServiceV2.apply)
 

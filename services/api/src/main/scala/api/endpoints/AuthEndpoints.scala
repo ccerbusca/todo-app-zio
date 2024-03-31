@@ -2,7 +2,7 @@ package api.endpoints
 
 import api.errors.ApiError
 import api.request.UserAuthenticate
-import api.services.{AuthService, JwtService}
+import api.services.{ AuthService, JwtService }
 import zio.*
 import zio.http.*
 import zio.http.endpoint.*

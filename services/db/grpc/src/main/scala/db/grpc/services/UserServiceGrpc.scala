@@ -4,10 +4,10 @@ import api.request.UserRegister
 import db.entities
 import db.repos.UserRepo
 import io.github.arainko.ducktape.*
-import io.grpc.{Status, StatusException}
+import io.grpc.{ Status, StatusException }
 import scalapb.UnknownFieldSet
 import users.user.ZioUser.UserService
-import users.user.{User, Username}
+import users.user.{ User, Username }
 import zio.*
 
 case class UserServiceGrpc(userRepo: UserRepo) extends UserService {
