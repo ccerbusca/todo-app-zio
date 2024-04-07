@@ -1,6 +1,6 @@
 object V {
   val zio               = "2.0.21"
-  val zioHttp           = "3.0.0-RC5"
+  val zioHttp           = "3.0.0-RC6"
   val zioJson           = "0.6.2"
   val zioSchema         = "1.0.1"
   val quill             = "4.8.1"
