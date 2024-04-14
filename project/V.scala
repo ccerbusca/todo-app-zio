@@ -1,5 +1,5 @@
 object V {
-  val zio               = "2.0.21"
+  val zio               = "2.0.22"
   val zioHttp           = "3.0.0-RC5"
   val zioJson           = "0.6.2"
   val zioSchema         = "1.0.1"
