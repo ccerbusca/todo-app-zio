@@ -2,7 +2,7 @@ resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos
 
 addSbtPlugin("ch.epfl.scala"         % "sbt-scalafix"        % "0.12.0")
 addSbtPlugin("io.github.davidmweber" % "flyway-sbt"          % "7.4.0")
-addSbtPlugin("com.github.sbt"        % "sbt-native-packager" % "1.9.16")
+addSbtPlugin("com.github.sbt"        % "sbt-native-packager" % "1.10.0")
 
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.7")
 
