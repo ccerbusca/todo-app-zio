@@ -11,5 +11,5 @@ object V {
   val postgres          = "42.7.3"
   val password4j        = "1.8.1"
   val grpcNetty         = "1.60.1"
-  val zioLogging        = "2.2.0"
+  val zioLogging        = "2.2.3"
 }
