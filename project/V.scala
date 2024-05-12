@@ -5,7 +5,7 @@ object V {
   val zioSchema         = "1.0.1"
   val quill             = "4.8.1"
   val ducktape          = "0.1.11"
-  val jwtScala          = "10.0.0"
+  val jwtScala          = "10.0.1"
   val zioTestcontainers = "0.10.0"
   val ksuid             = "1.1.2"
   val postgres          = "42.7.3"
