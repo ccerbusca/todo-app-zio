@@ -3,7 +3,7 @@ object V {
   val zioHttp           = "3.0.0-RC5"
   val zioJson           = "0.6.2"
   val zioSchema         = "1.0.1"
-  val quill             = "4.8.1"
+  val quill             = "4.8.4"
   val ducktape          = "0.1.11"
   val jwtScala          = "10.0.0"
   val zioTestcontainers = "0.10.0"
