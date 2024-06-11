@@ -13,11 +13,11 @@ case class UserEndpoints(userService: UserService) {
   private val register =
     UserEndpoints
       .register
-      .implement(Handler.fromFunctionZIO(userService.add))
+      .implement(userService.add)
 
-  val all: HttpApp[Any] = Routes(
+  val all: Routes[Any, Nothing] = Routes(
     register
-  ).toHttpApp
+  )
 
 }
 

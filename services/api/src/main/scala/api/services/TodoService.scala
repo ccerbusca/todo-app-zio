@@ -1,7 +1,6 @@
 package api.services
 
 import api.auth.*
-import api.domain.*
 import api.errors.ApiError
 import api.request.AddTodo
 import api.response.TodoResponse

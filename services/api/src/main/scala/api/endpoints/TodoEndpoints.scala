@@ -15,57 +15,47 @@ case class TodoEndpoints(todoService: TodoService) {
   private val add =
     TodoEndpoints
       .addTodo
-      .implement {
-        Handler.fromFunctionZIO { addTodo =>
-          Auth.authContext[JwtContent].flatMap { ctx =>
-            todoService.add(addTodo, ctx.id)
-          }
+      .implement { addTodo =>
+        ZIO.serviceWithZIO[JwtContent] { ctx =>
+          todoService.add(addTodo, ctx.id)
         }
       }
 
   private val allForUser =
     TodoEndpoints
       .allTodosForUser
-      .implement {
-        Handler.fromZIO {
-          Auth.authContext[JwtContent].flatMap { ctx =>
-            todoService.allForUser(ctx.id)
-          }
+      .implement { _ =>
+        ZIO.serviceWithZIO[JwtContent] { ctx =>
+          todoService.allForUser(ctx.id)
         }
       }
 
   private val markCompleted =
     TodoEndpoints
       .markCompleted
-      .implement {
-        Handler.fromFunctionZIO { id =>
-          Auth.authContext[JwtContent].flatMap { ctx =>
-            todoService.ownedBy(id, ctx.id) *>
-              todoService.markCompleted(id)
-          }
+      .implement { id =>
+        ZIO.serviceWithZIO[JwtContent] { ctx =>
+          todoService.ownedBy(id, ctx.id) *>
+            todoService.markCompleted(id)
         }
       }
 
   private val getTodoById =
     TodoEndpoints
       .getTodoById
-      .implement {
-        Handler.fromFunctionZIO { id =>
-          Auth.authContext[JwtContent].flatMap { ctx =>
-            todoService.ownedBy(id, ctx.id) *>
-              todoService.get(id)
-          }
+      .implement { id =>
+        ZIO.serviceWithZIO[JwtContent] { ctx =>
+          todoService.ownedBy(id, ctx.id) *>
+            todoService.get(id)
         }
       }
 
-  private val routes = Routes(
+  val all: Routes[JwtService, Nothing] = Routes(
     add,
     allForUser,
     markCompleted,
     getTodoById,
   ) @@ api.auth.authMiddleware
-
-  val all: HttpApp[JwtService & Auth[JwtContent]] = routes.toHttpApp
 
 }
 

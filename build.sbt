@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion     := "3.3.3"
+ThisBuild / scalaVersion := "3.4.0"
 ThisBuild / organization     := "todo"
 ThisBuild / organizationName := "todo"
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
   .aggregate(domain, api, grpc_db, protos)
 
 lazy val api = (project in file("services/api"))
-  .dependsOn(protos, domain, grpc_db, simple_db)
+  .dependsOn(domain, grpc_client_db)
   .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
   .settings(stdSettings("api"))
   .settings(flywaySettings)
@@ -42,12 +42,12 @@ lazy val api = (project in file("services/api"))
       "org.postgresql"         % "postgresql"                        % V.postgres,
       "com.password4j"         % "password4j"                        % V.password4j,
       "io.grpc"                % "grpc-netty"                        % V.grpcNetty,
-    ),
+    )
   )
 
 lazy val simple_db = (project in file("services/db/simple"))
   .dependsOn(domain)
-  .enablePlugins(FlywayPlugin, JavaAppPackaging, DockerPlugin)
+  .enablePlugins(FlywayPlugin)
   .settings(stdSettings("db-simple"))
   .settings(flywaySettings)
   .settings(
@@ -62,7 +62,7 @@ lazy val simple_db = (project in file("services/db/simple"))
       "org.postgresql" % "postgresql" % V.postgres,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % V.zioTestcontainers % Test,
-    ),
+    )
   )
 
 lazy val grpc_db = (project in file("services/db/grpc"))
@@ -84,8 +84,12 @@ lazy val grpc_db = (project in file("services/db/grpc"))
       "io.github.arainko"     %% "ducktape"                          % V.ducktape,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
       "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
-    ),
+    )
   )
+
+lazy val grpc_client_db = (project in file("services/db/grpc-clients"))
+  .dependsOn(grpc_db)
+  .settings(stdSettings("db-grpc-clients"))
 
 lazy val protos = (project in file("services/protos"))
   .settings(

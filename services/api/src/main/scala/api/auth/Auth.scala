@@ -36,7 +36,7 @@ object Auth {
 
 }
 
-def authMiddleware: HandlerAspect[Auth[JwtContent] & JwtService, Unit] =
+def _authMiddleware: HandlerAspect[Auth[JwtContent] & JwtService, Unit] =
   Middleware.customAuthZIO { req =>
     req.headers.header(Header.Authorization) match {
       case Some(Header.Authorization.Bearer(token)) =>
@@ -53,10 +53,9 @@ def authMiddleware: HandlerAspect[Auth[JwtContent] & JwtService, Unit] =
     }
   }
 
-//doesnt work on Endpoints lol
-def _authMiddleware[R]: HandlerAspect[R & JwtService, JwtContent] =
+def authMiddleware: HandlerAspect[JwtService, JwtContent] =
   Middleware
-    .customAuthProvidingZIO[R & JwtService, JwtContent](headers =>
+    .customAuthProvidingZIO[JwtService, JwtContent](headers =>
       headers.header(Header.Authorization) match {
         case Some(Header.Authorization.Bearer(token)) =>
           JwtService

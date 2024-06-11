@@ -12,17 +12,15 @@ case class AuthEndpoints(authService: AuthService, jwtService: JwtService) {
   private val login =
     AuthEndpoints
       .loginEndpoint
-      .implement {
-        Handler.fromFunctionZIO[UserAuthenticate] { userPayload =>
-          authService
-            .authenticate(userPayload)
-            .flatMap(jwtService.encode)
-        }
+      .implement { userPayload =>
+        authService
+          .authenticate(userPayload)
+          .flatMap(jwtService.encode)
       }
 
-  val all: HttpApp[Any] = Routes(
+  val all: Routes[Any, Nothing] = Routes(
     login
-  ).toHttpApp
+  )
 
 }
 
