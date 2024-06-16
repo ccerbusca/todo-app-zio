@@ -3,7 +3,7 @@ package api.server
 import api.JwtContent
 import api.auth.*
 import api.endpoints.*
-import api.services.{AuthService, JwtService, TodoService, UserService}
+import api.services.{ AuthService, JwtService, TodoService, UserService }
 import zio.*
 import zio.http.Server
 import zio.http.codec.HttpCodec.*
