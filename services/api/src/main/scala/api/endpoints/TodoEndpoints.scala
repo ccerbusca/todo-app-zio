@@ -5,7 +5,7 @@ import api.auth.Auth
 import api.errors.ApiError
 import api.request.AddTodo
 import api.response.TodoResponse
-import api.services.{JwtService, TodoService}
+import api.services.{ JwtService, TodoService }
 import zio.*
 import zio.http.*
 import zio.http.endpoint.*

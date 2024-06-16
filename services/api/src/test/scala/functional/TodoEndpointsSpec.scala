@@ -7,12 +7,12 @@ import api.request.AddTodo
 import api.response.TodoResponse
 import api.services.*
 import db.entities.User
-import db.repos.{TodoRepo, UserRepo}
+import db.repos.{ TodoRepo, UserRepo }
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
 import io.github.arainko.ducktape.*
 import utils.LoginUtils
-import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
+import utils.testinstances.{ AddTodoGenerator, UserRegisterGenerator }
 import zio.*
 import zio.http.*
 import zio.http.Header.Authorization
@@ -41,7 +41,7 @@ object TodoEndpointsSpec extends BaseFunctionalTest {
           user     <- LoginUtils.testUser
           addTodos <- ZIO.collectAll(Set.fill(3)(AddTodoGenerator.generate))
           todos    <- ZIO.foreachPar(addTodos)(addTodo => ZIO.serviceWithZIO[TodoRepo](_.add(addTodo, user.id)))
-          result <- checkSuccessWithUser(user, request) {
+          result   <- checkSuccessWithUser(user, request) {
             _.fromJson[Set[TodoResponse]].toOption.get == todos.map(_.to[TodoResponse])
           }
         } yield result
@@ -70,8 +70,8 @@ object TodoEndpointsSpec extends BaseFunctionalTest {
           ) { body =>
             val todoResponse = body.fromJson[TodoResponse].toOption.get
             todoResponse.title == addTodo.title &&
-              todoResponse.content == addTodo.content &&
-              !todoResponse.completed
+            todoResponse.content == addTodo.content &&
+            !todoResponse.completed
           }
         } yield result
       },
