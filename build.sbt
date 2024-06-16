@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "3.4.0"
+ThisBuild / scalaVersion     := "3.4.2"
 ThisBuild / organization     := "todo"
 ThisBuild / organizationName := "todo"
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
@@ -52,16 +52,16 @@ lazy val simple_db = (project in file("services/db/simple"))
   .settings(flywaySettings)
   .settings(
     libraryDependencies ++= Seq(
-      "dev.zio" %% "zio" % V.zio,
-      "dev.zio" %% "zio-test" % V.zio % Test,
-      "dev.zio" %% "zio-test-sbt" % V.zio % Test,
-      "dev.zio" %% "zio-test-magnolia" % V.zio % Test,
-      "dev.zio" %% "zio-logging" % V.zioLogging,
-      "dev.zio" %% "zio-logging-slf4j" % V.zioLogging,
-      "io.getquill" %% "quill-jdbc-zio" % V.quill,
-      "org.postgresql" % "postgresql" % V.postgres,
+      "dev.zio"               %% "zio"                               % V.zio,
+      "dev.zio"               %% "zio-test"                          % V.zio               % Test,
+      "dev.zio"               %% "zio-test-sbt"                      % V.zio               % Test,
+      "dev.zio"               %% "zio-test-magnolia"                 % V.zio               % Test,
+      "dev.zio"               %% "zio-logging"                       % V.zioLogging,
+      "dev.zio"               %% "zio-logging-slf4j"                 % V.zioLogging,
+      "io.getquill"           %% "quill-jdbc-zio"                    % V.quill,
+      "org.postgresql"         % "postgresql"                        % V.postgres,
       "io.github.scottweaver" %% "zio-2-0-testcontainers-postgresql" % V.zioTestcontainers % Test,
-      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect" % V.zioTestcontainers % Test,
+      "io.github.scottweaver" %% "zio-2-0-db-migration-aspect"       % V.zioTestcontainers % Test,
     )
   )
 
