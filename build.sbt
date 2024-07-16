@@ -1,4 +1,4 @@
-ThisBuild / scalaVersion := "3.4.0"
+ThisBuild / scalaVersion := "3.4.2"
 ThisBuild / organization     := "todo"
 ThisBuild / organizationName := "todo"
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("releases") ++ Resolver.sonatypeOssRepos("snapshots")
