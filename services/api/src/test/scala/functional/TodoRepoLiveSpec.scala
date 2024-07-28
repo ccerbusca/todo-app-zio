@@ -3,7 +3,7 @@ package functional
 import db.repos.*
 import io.getquill.SnakeCase
 import io.getquill.jdbczio.Quill
-import utils.testinstances.{AddTodoGenerator, UserRegisterGenerator}
+import utils.testinstances.{ AddTodoGenerator, UserRegisterGenerator }
 import zio.*
 import zio.test.*
 

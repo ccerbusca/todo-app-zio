@@ -7,7 +7,7 @@ import api.response.UserResponse
 import db.repos.UserRepo
 import io.github.arainko.ducktape.*
 import users.user.ZioUser.UserServiceClient
-import users.user.{Username, User as GUser}
+import users.user.{ User as GUser, Username }
 import zio.*
 import zio.http.*
 import zio.http.endpoint.*

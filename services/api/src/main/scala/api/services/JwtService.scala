@@ -3,12 +3,12 @@ package api.services
 import api.JwtContent
 import api.errors.ApiError
 import db.entities.User
-import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtZIOJson}
+import pdi.jwt.{ JwtAlgorithm, JwtClaim, JwtZIOJson }
 import zio.*
 import zio.json.*
 
 import java.security.spec.ECGenParameterSpec
-import java.security.{KeyPairGenerator, PrivateKey, PublicKey}
+import java.security.{ KeyPairGenerator, PrivateKey, PublicKey }
 
 trait JwtService {
   def encode(user: User): UIO[String]
