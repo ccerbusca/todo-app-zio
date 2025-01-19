@@ -4,7 +4,7 @@ import api.request.AddTodo
 import db.entities
 import db.repos.TodoRepo
 import io.github.arainko.ducktape.*
-import io.grpc.{Status, StatusException}
+import io.grpc.{ Status, StatusException }
 import scalapb.UnknownFieldSet
 import todos.todo.*
 import todos.todo.ZioTodo.TodoService
