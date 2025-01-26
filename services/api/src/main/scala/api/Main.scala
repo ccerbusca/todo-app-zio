@@ -1,11 +1,11 @@
 package api
 
-import api.auth.{Auth, PasswordEncoder}
+import api.auth.{ Auth, PasswordEncoder }
 import api.server.TodoServer
-import api.services.{AuthService, JwtService, TodoService, UserService}
-import db.repos.{TodoRepo, UserRepo}
+import api.services.{ AuthService, JwtService, TodoService, UserService }
+import db.repos.{ TodoRepo, UserRepo }
 import zio.http.Server
-import zio.{ZIO, ZIOAppDefault}
+import zio.{ ZIO, ZIOAppDefault }
 
 object Main extends ZIOAppDefault {
 
