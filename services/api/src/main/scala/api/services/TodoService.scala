@@ -8,7 +8,7 @@ import db.entities.*
 import db.repos.TodoRepo
 import io.github.arainko.ducktape.*
 import todos.todo.ZioTodo.TodoServiceClient
-import todos.todo.{AddTodoRequest, Id, Todo as GTodo}
+import todos.todo.{ AddTodoRequest, Id, Todo as GTodo }
 import zio.*
 import zio.http.*
 import zio.json.*
